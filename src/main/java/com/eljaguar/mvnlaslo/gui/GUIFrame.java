@@ -74,7 +74,7 @@ public class GUIFrame extends javax.swing.JFrame {
         loopMatcher = new LoopMatcher();
         isRunning = false;
         this.locale = new Locale("en", "US");
-        this.bundle = getBundle("resources/Bundle", locale);
+        this.bundle = getBundle("Bundle", locale);
         initComponents();
         this.jCBMI_English.setSelected(true);
         this.jCBMI_Spanish.setSelected(false);
@@ -175,7 +175,6 @@ public class GUIFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("LASLO");
         setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        setIconImage(new ImageIcon(getClass().getResource("/resources/noun_DNA_1088243.png")).getImage());
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(533, 437));
         setResizable(false);
@@ -188,6 +187,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("Bundle",new Locale("en_US")); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -235,8 +235,9 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
-        jButtonOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/noun_53223_cc.png"))); // NOI18N
+        jButtonOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/noun_53223_cc.png"))); // NOI18N
         jButtonOut.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButtonOut.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/noun_53223_cc.png"))); // NOI18N
         jButtonOut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonOutActionPerformed(evt);
@@ -570,7 +571,7 @@ public class GUIFrame extends javax.swing.JFrame {
             }
         });
 
-        jButtonIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/noun_53223_cc.png"))); // NOI18N
+        jButtonIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/noun_53223_cc.png"))); // NOI18N
         jButtonIn.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButtonIn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -588,16 +589,17 @@ public class GUIFrame extends javax.swing.JFrame {
             jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanFileLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanFileLayout.createSequentialGroup()
+                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanFileLayout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(22, 22, 22)
                         .addComponent(jTFPathIn, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButtonIn)
-                        .addGap(4, 4, 4)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(31, 31, 31))))
         );
         jPanFileLayout.setVerticalGroup(
             jPanFileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -641,7 +643,7 @@ public class GUIFrame extends javax.swing.JFrame {
             .addGroup(jPanOnlineLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanOnlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
                     .addGroup(jPanOnlineLayout.createSequentialGroup()
                         .addComponent(jrbNcbi)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1117,7 +1119,7 @@ public class GUIFrame extends javax.swing.JFrame {
     private void setDisplayLanguage(String lang, String country) {
 
         this.locale = new Locale(lang, country);
-        this.bundle = getBundle("resources/Bundle", locale);
+        this.bundle = getBundle("Bundle", locale);
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbExtended.setText(bundle.getString("EXTENDED_MODE_CHECK")); // NOI18N
         jLblNRand.setText(bundle.getString("RANDOM_NUMBERS")); // NOI18N

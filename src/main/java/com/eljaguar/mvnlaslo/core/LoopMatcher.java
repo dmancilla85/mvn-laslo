@@ -112,7 +112,7 @@ public class LoopMatcher {
         this.numberOfRandoms = 0;
         this.additionalSequence = additionalSequence;
         this.kLetRandoms = kLetRandoms;
-        this.bundle = ResourceBundle.getBundle("resources/Bundle", locale);
+        this.bundle = ResourceBundle.getBundle("Bundle", locale);
         SequenceAnalizer.setBundle(bundle);
         this.searchReverse = searchReverse;
         this.temperature = RNAFoldConfiguration.DEFAULT_TEMP;
