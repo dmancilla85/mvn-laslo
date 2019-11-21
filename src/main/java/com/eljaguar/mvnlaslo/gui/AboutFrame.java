@@ -52,15 +52,7 @@ public class AboutFrame extends javax.swing.JFrame {
         "Copyright (C) 2018 David A. Mancilla\n" +
         "GNU General Public License http://www.gnu.org/licenses/.";
         
-        
-        
         initComponents();
-        this.setSize(640, 480);
-        this.jTextArea1.setText(aboutText);
-        this.jTextArea1.setCaretPosition(0);
-        this.jTxtInfo.setText(/*"\nDeveloped by RNA Celular Biology Lab at Leloir Institute. \u00A9 2018.\n\n" + 
-                "Lab website: https://www.leloir.org.ar/boccaccio/\n" +*/
-                "Copyright (C) 2018\nProgrammer: David A. Mancilla\ne-mail: david.a.m@live.com");
     }
 
     /**
@@ -73,35 +65,18 @@ public class AboutFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTxtInfo = new javax.swing.JTextArea();
 
-        setTitle("About...");
+        setTitle("About FInd-A-Loop...");
         setAlwaysOnTop(true);
         setLocationByPlatform(true);
         setMaximumSize(new java.awt.Dimension(480, 600));
-        setPreferredSize(new java.awt.Dimension(480, 600));
+        setPreferredSize(new java.awt.Dimension(480, 300));
         setResizable(false);
-        setSize(new java.awt.Dimension(480, 600));
+        setSize(new java.awt.Dimension(480, 300));
         setType(java.awt.Window.Type.POPUP);
-
-        jLabel1.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/rnastemloop.jpg"))); // NOI18N
-        jLabel1.setText("  About LASLO");
-
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setTabSize(4);
-        jTextArea1.setToolTipText("");
-        jTextArea1.setWrapStyleWord(true);
-        jScrollPane2.setViewportView(jTextArea1);
 
         jButton1.setText("Exit");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -113,10 +88,12 @@ public class AboutFrame extends javax.swing.JFrame {
         jTxtInfo.setEditable(false);
         jTxtInfo.setBackground(javax.swing.UIManager.getDefaults().getColor("Panel.background"));
         jTxtInfo.setColumns(20);
-        jTxtInfo.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jTxtInfo.setFont(new java.awt.Font("Calibri Light", 0, 14)); // NOI18N
+        jTxtInfo.setForeground(new java.awt.Color(51, 51, 51));
         jTxtInfo.setLineWrap(true);
         jTxtInfo.setRows(5);
         jTxtInfo.setTabSize(4);
+        jTxtInfo.setText("Designed to find stem-loops structures with defined loop patterns. Supports FASTA and GenBank file format. \nPredicts the secondary structure with RNAFold. \nUses the U-Shuffle algorithm to generate shuffled sequences.\nAble to download GenBank sequences online from NCBI.\n\nDesigned in colaboration with RNA Celular Biology Lab at Leloir Institute. \nDeveloped by: David A. Mancilla\ne-mail: david.a.m@live.com\n\nCopyright (C) 2018"); // NOI18N
         jTxtInfo.setWrapStyleWord(true);
         jTxtInfo.setAutoscrolls(false);
         jTxtInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -127,28 +104,23 @@ public class AboutFrame extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2))
-                .addContainerGap())
+                        .addGap(14, 14, 14)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(193, 193, 193)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap())
+                .addComponent(jButton1)
+                .addContainerGap(234, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -199,11 +171,8 @@ public class AboutFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTxtInfo;
     // End of variables declaration//GEN-END:variables
 

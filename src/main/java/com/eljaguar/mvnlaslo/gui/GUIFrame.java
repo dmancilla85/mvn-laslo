@@ -46,7 +46,6 @@ import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
@@ -78,7 +77,7 @@ public class GUIFrame extends javax.swing.JFrame {
         initComponents();
         this.jCBMI_English.setSelected(true);
         this.jCBMI_Spanish.setSelected(false);
-        this.jLblError.setText("");
+        this.jLblError.setVisible(false);
         this.jftNumberOfRandoms.setValue(10);
         this.jftkLet.setValue(2);
         this.jsTemperature.setValue(RNAFoldConfiguration.DEFAULT_TEMP);
@@ -96,7 +95,7 @@ public class GUIFrame extends javax.swing.JFrame {
         this.jProgressBar1.setStringPainted(true);
         this.jTabInput.setSelectedIndex(0);
         this.geneList = new ArrayList<>();
-
+        
         TextAreaOutputStream taos = new TextAreaOutputStream(jTAConsole);
         PrintStream ps = new PrintStream(taos);
         setOut(ps);
@@ -173,7 +172,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jMIAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("LASLO");
+        setTitle("Find-A-Loop");
         setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(533, 437));
@@ -187,7 +186,6 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("Bundle",new Locale("en_US")); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -493,7 +491,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jTAConsole.setLineWrap(true);
         jTAConsole.setRows(5);
         jTAConsole.setToolTipText("");
-        jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OUTPUT_TITLE"))); // NOI18N
+        jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("MONITOR"))); // NOI18N
         jTAConsole.setFocusable(false);
         jTAConsole.setVerifyInputWhenFocusTarget(false);
         jScrollPane2.setViewportView(jTAConsole);
@@ -1145,6 +1143,8 @@ public class GUIFrame extends javax.swing.JFrame {
         jLabel7.setText(bundle.getString("DESCRIPTION")); // NOI18N
         jTabInput.addTab(bundle.getString("TAB_FILE"), jPanFile); // NOI18N
         jrbNcbi.setText("NCBI");
+		jcbAvoidLonePairs.setText(bundle.getString("AVOID_PAIRS"));
+		jMenuLanguage.setText(bundle.getString("LANGUAGE"));
         jLabel8.setText(bundle.getString("NCBI_DESC")); // NOI18N
         jTabInput.addTab(bundle.getString("TAB_WEB"), jPanOnline); // NOI18N
         jMenuFile.setText(bundle.getString("FILE")); // NOI18N
