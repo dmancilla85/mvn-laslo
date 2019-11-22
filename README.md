@@ -1,4 +1,4 @@
-# LASLO v1.20 - README
+# Find-A-Loop v1.20 - README
 
 ## Introduction
 
