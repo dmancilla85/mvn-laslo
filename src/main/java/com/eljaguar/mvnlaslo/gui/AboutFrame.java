@@ -16,6 +16,9 @@
  */
 package com.eljaguar.mvnlaslo.gui;
 
+import java.awt.Color;
+import javax.swing.UIManager;
+
 /**
  *
  * @author david
@@ -23,35 +26,33 @@ package com.eljaguar.mvnlaslo.gui;
 public class AboutFrame extends javax.swing.JFrame {
 
     private String aboutText;
-    
-    
-    
+
     /**
      * Creates new form AboutFrame
      */
     public AboutFrame() {
-        aboutText = "LASLO v1.0 - README\n\n" +
-        "Introduction\n" +
-        "Multi-threaded application that searches for hairpin structures in cDNA / mRNA sequences (FASTA or GenBank) with specific consensus sequences in the loop. It implements RNAfold to predict the structure of the sequence, and UShuffle to generate random sequences with conservation of the k-nucleotide frequency.\n" +
-        "\n\n" +
-        "Requirements\n" +
-        "JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences.\n" +
-        "\n" +
-        "Instructions\n" +
-        "Credits and Acknowledgments\n" +
-        "RNAfold 2.4.9 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html\n" +
-        "\n" +
-        "UShuffle - Minghui Jiang, James Anderson, Joel Gillespie, and Martin Mayne. uShuffle: a useful tool for shuffling biological sequences while preserving the k-let counts. BMC Bioinformatics, 9:#192, 2008. https://github.com/guma44/ushuffle\n" +
-        "\n" +
-        "BioJava (Core 4.2.0) - Andreas Prlic; Andrew Yates; Spencer E. Bliven; Peter W. Rose; Julius Jacobsen; Peter V. Troshin; Mark Chapman; Jianjiong Gao; Chuan Hock Koh; Sylvain Foisy; Richard Holland; Gediminas Rimsa; Michael L. Heuer; H. Brandstatter-Muller; Philip E. Bourne; Scooter Willis. BioJava: an open-source framework for bioinformatics in 2012. Bioinformatics (2012) 28 (20): 2693-2695. https://github.com/biojava/biojava\n" +
-        "\n" +
-        "OpenCSV 4.1 - A Simple CSV Parser for Java under a commercial-friendly Apache 2.0 license\n" +
-        "https://sourceforge.net/projects/opencsv/\n" +
-        "\n" +
-        "License\n" +
-        "Copyright (C) 2018 David A. Mancilla\n" +
-        "GNU General Public License http://www.gnu.org/licenses/.";
-        
+        aboutText = "LASLO v1.0 - README\n\n"
+                + "Introduction\n"
+                + "Multi-threaded application that searches for hairpin structures in cDNA / mRNA sequences (FASTA or GenBank) with specific consensus sequences in the loop. It implements RNAfold to predict the structure of the sequence, and UShuffle to generate random sequences with conservation of the k-nucleotide frequency.\n"
+                + "\n\n"
+                + "Requirements\n"
+                + "JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences.\n"
+                + "\n"
+                + "Instructions\n"
+                + "Credits and Acknowledgments\n"
+                + "RNAfold 2.4.9 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html\n"
+                + "\n"
+                + "UShuffle - Minghui Jiang, James Anderson, Joel Gillespie, and Martin Mayne. uShuffle: a useful tool for shuffling biological sequences while preserving the k-let counts. BMC Bioinformatics, 9:#192, 2008. https://github.com/guma44/ushuffle\n"
+                + "\n"
+                + "BioJava (Core 4.2.0) - Andreas Prlic; Andrew Yates; Spencer E. Bliven; Peter W. Rose; Julius Jacobsen; Peter V. Troshin; Mark Chapman; Jianjiong Gao; Chuan Hock Koh; Sylvain Foisy; Richard Holland; Gediminas Rimsa; Michael L. Heuer; H. Brandstatter-Muller; Philip E. Bourne; Scooter Willis. BioJava: an open-source framework for bioinformatics in 2012. Bioinformatics (2012) 28 (20): 2693-2695. https://github.com/biojava/biojava\n"
+                + "\n"
+                + "OpenCSV 4.1 - A Simple CSV Parser for Java under a commercial-friendly Apache 2.0 license\n"
+                + "https://sourceforge.net/projects/opencsv/\n"
+                + "\n"
+                + "License\n"
+                + "Copyright (C) 2018 David A. Mancilla\n"
+                + "GNU General Public License http://www.gnu.org/licenses/.";
+
         initComponents();
     }
 
@@ -89,7 +90,6 @@ public class AboutFrame extends javax.swing.JFrame {
         jTxtInfo.setBackground(javax.swing.UIManager.getDefaults().getColor("Panel.background"));
         jTxtInfo.setColumns(20);
         jTxtInfo.setFont(new java.awt.Font("Calibri Light", 0, 14)); // NOI18N
-        jTxtInfo.setForeground(new java.awt.Color(51, 51, 51));
         jTxtInfo.setLineWrap(true);
         jTxtInfo.setRows(5);
         jTxtInfo.setTabSize(4);
@@ -142,7 +142,7 @@ public class AboutFrame extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
+ /*try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
@@ -157,7 +157,41 @@ public class AboutFrame extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(AboutFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(AboutFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         */
+
+        UIManager.put("control", new Color(128, 128, 128));
+        UIManager.put("info", new Color(128, 128, 128));
+        UIManager.put("nimbusBase", new Color(18, 30, 49));
+        UIManager.put("nimbusAlertYellow", new Color(248, 187, 0));
+        UIManager.put("nimbusDisabledText", new Color(128, 128, 128));
+        UIManager.put("nimbusFocus", new Color(115, 164, 209));
+        UIManager.put("nimbusGreen", new Color(176, 179, 50));
+        UIManager.put("nimbusInfoBlue", new Color(66, 139, 221));
+        UIManager.put("nimbusLightBackground", new Color(18, 30, 49));
+        UIManager.put("nimbusOrange", new Color(191, 98, 4));
+        UIManager.put("nimbusRed", new Color(169, 46, 34));
+        UIManager.put("nimbusSelectedText", new Color(255, 255, 255));
+        UIManager.put("nimbusSelectionBackground", new Color(104, 93, 156));
+        UIManager.put("text", new Color(230, 230, 230));
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (javax.swing.UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         //</editor-fold>
         //</editor-fold>
 
@@ -189,4 +223,5 @@ public class AboutFrame extends javax.swing.JFrame {
     public void setAboutText(String aboutText) {
         this.aboutText = aboutText;
     }
+
 }
