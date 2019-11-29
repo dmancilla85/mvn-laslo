@@ -48,6 +48,7 @@ import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import static javax.swing.JFileChooser.APPROVE_OPTION;
@@ -174,8 +175,9 @@ public class GUIFrame extends javax.swing.JFrame {
         jMIAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Find-A-Loop");
+        setTitle("LASLO");
         setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        setIconImage(new ImageIcon(getClass().getResource("/noun_DNA_1088243.png")).getImage());
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(533, 437));
         setResizable(false);
@@ -421,10 +423,10 @@ public class GUIFrame extends javax.swing.JFrame {
                     .addGroup(jPanOptionsLayout.createSequentialGroup()
                         .addComponent(jLblStemBetween, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSpinMinLength, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jSpinMaxLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(252, 252, 252))
+                        .addGap(236, 236, 236))
                     .addGroup(jPanOptionsLayout.createSequentialGroup()
                         .addGroup(jPanOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanOptionsLayout.createSequentialGroup()
@@ -446,6 +448,9 @@ public class GUIFrame extends javax.swing.JFrame {
                         .addComponent(jftAdditionalSeq)
                         .addContainerGap())))
         );
+
+        jPanOptionsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jSpinMaxLength, jSpinMinLength});
+
         jPanOptionsLayout.setVerticalGroup(
             jPanOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanOptionsLayout.createSequentialGroup()
@@ -493,7 +498,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jTAConsole.setLineWrap(true);
         jTAConsole.setRows(5);
         jTAConsole.setToolTipText("");
-        jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("MONITOR"))); // NOI18N
+        jTAConsole.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("OUTPUT_TITLE"))); // NOI18N
         jTAConsole.setFocusable(false);
         jTAConsole.setVerifyInputWhenFocusTarget(false);
         jScrollPane2.setViewportView(jTAConsole);
@@ -643,7 +648,7 @@ public class GUIFrame extends javax.swing.JFrame {
             .addGroup(jPanOnlineLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanOnlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
                     .addGroup(jPanOnlineLayout.createSequentialGroup()
                         .addComponent(jrbNcbi)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)

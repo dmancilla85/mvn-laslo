@@ -219,17 +219,18 @@ public class GenBankID extends SourceFile {
         for (String transcriptoId : genBankId) {
             try {
                 request = String.format("db=nuccore&id=%s&rettype=gb&retmode=text",
-                        transcriptoId);
+                        transcriptoId.trim());
 
                 // Request to NCBI e-fetch
                 ncbiGenbank = new URL(E_FETCH + request);
                 tmp = GenbankReaderHelper.readGenbankDNASequence(
                         ncbiGenbank.openStream());
+                out.println(transcriptoId.trim() + "...");
 
             } catch (MalformedURLException ex) {
                 out.println("ERROR: Malformed URL Exception. Cause: "
                         + ex.getCause().getMessage());
-                return null;
+                //return null;
             } catch (IOException ex) {
 
                 if (ex.getLocalizedMessage().contains("400")) {
@@ -238,7 +239,7 @@ public class GenBankID extends SourceFile {
                     out.println("ERROR: IO Exception (" + transcriptoId
                             + "). " + ex.getMessage());
                 }
-                return null;
+                //return null;
             }
 
             if (tmp != null && tmp.size() > 0) {
