@@ -1,4 +1,4 @@
-# Find-A-Loop v1.20 - README
+# Find-A-Loop v1.2.2 - README
 
 ## Introduction
 
@@ -9,7 +9,8 @@ Multi-threaded application that searches for hairpin structures in cDNA / mRNA s
 JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences. This version only runs in a Windows x64 SO, because of the external executables.
 
 ## Latest releases
-
+- 1.22 29/11/19 :
+	- Fixed some issues with NCBI downloads.
 - 1.20 17/10/19 : 
 	- Added proxy configuration feature.
 
