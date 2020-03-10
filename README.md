@@ -1,4 +1,4 @@
-# Find-A-Loop v1.2.2 - README
+# LoopMatcher (aka LASLO) v1.2.2 - README
 
 ## Introduction
 
