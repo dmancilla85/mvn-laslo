@@ -18,16 +18,18 @@
 package com.eljaguar.mvnlaslo.core;
 
 import static com.eljaguar.mvnlaslo.core.SequenceAnalizer.reverseIt;
+import com.eljaguar.mvnlaslo.io.BioMartFasta;
+import com.eljaguar.mvnlaslo.io.EnsemblFasta;
+import com.eljaguar.mvnlaslo.io.FlyBaseFasta;
+import com.eljaguar.mvnlaslo.io.GenBank;
+import com.eljaguar.mvnlaslo.io.Generic;
 import com.eljaguar.mvnlaslo.io.InputSequence;
-import com.eljaguar.mvnlaslo.io.BioMartFastaID;
-import com.eljaguar.mvnlaslo.io.GenericID;
 import com.eljaguar.mvnlaslo.io.SourceFile;
-import com.eljaguar.mvnlaslo.io.FlyBaseFastaID;
-import com.eljaguar.mvnlaslo.io.EnsemblFastaID;
-import com.eljaguar.mvnlaslo.io.GenBankID;
+import com.eljaguar.mvnlaslo.io.Vienna;
 import static java.lang.System.out;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -114,7 +116,7 @@ public class StemLoop {
      */
     private String getFormattedNumber(Double number, int digits) {
         NumberFormat numberFormatter
-                = NumberFormat.getNumberInstance(Locale.getDefault());
+          = NumberFormat.getNumberInstance(Locale.getDefault());
         numberFormatter.setMinimumFractionDigits(digits);
         return numberFormatter.format(number);
     }
@@ -133,23 +135,27 @@ public class StemLoop {
 
         switch (mode) {
             case ENSEMBL:
-                this.id_fasta = new EnsemblFastaID();
+                this.id_fasta = new EnsemblFasta();
                 break;
 
             case FLYBASE:
-                this.id_fasta = new FlyBaseFastaID();
+                this.id_fasta = new FlyBaseFasta();
                 break;
 
             case BIOMART:
-                this.id_fasta = new BioMartFastaID();
+                this.id_fasta = new BioMartFasta();
                 break;
 
             case GENERIC:
-                this.id_fasta = new GenericID();
+                this.id_fasta = new Generic();
                 break;
 
             case GENBANK:
-                this.id_fasta = new GenBankID();
+                this.id_fasta = new GenBank();
+                break;
+
+            case VIENNA:
+                this.id_fasta = new Vienna();
                 break;
 
         }
@@ -228,8 +234,8 @@ public class StemLoop {
         for (int i = 0; i < pattern.length(); i++) {
             aux = pattern.charAt(i);
             if (aux == 'N' || aux == 'K' || aux == 'M' || aux == 'W'
-                    || aux == 'B' || aux == 'D' || aux == 'R' || aux == 'H'
-                    || aux == 'S' || aux == 'Y' || aux == 'V') {
+              || aux == 'B' || aux == 'D' || aux == 'R' || aux == 'H'
+              || aux == 'S' || aux == 'Y' || aux == 'V') {
                 this.patternVariables.add(new BaseVariable('N', i));
             }
         }
@@ -265,72 +271,75 @@ public class StemLoop {
 
         switch (mode) {
             case ENSEMBL:
-                header = EnsemblFastaID.getHeader();
+                header = EnsemblFasta.getHeader();
                 break;
 
             case FLYBASE:
-                header = FlyBaseFastaID.getHeader();
+                header = FlyBaseFasta.getHeader();
                 break;
 
             case BIOMART:
-                header = BioMartFastaID.getHeader();
+                header = BioMartFasta.getHeader();
                 break;
 
             case GENBANK:
-                header = GenBankID.getHeader();
+                header = GenBank.getHeader();
                 break;
 
             case GENERIC:
-                header = GenericID.getHeader();
+                header = Generic.getHeader();
                 break;
+
+            case VIENNA:
+                header = "";
         }
 
         for (int i = 0; i < getMaxPatternLength(); i++) {
-            nVariablesTable += "N" + i + SourceFile.getROW_DELIMITER();
+            nVariablesTable += "N" + i + SourceFile.ROW_DELIMITER;
         }
 
         if (isHasAdditionalSequence()) {
-            additionalSequenceCol = "AdditionalSeqMatches" + SourceFile.getROW_DELIMITER()
-                    + "AdditionalSeqPositions" + SourceFile.getROW_DELIMITER();
+            additionalSequenceCol = "AdditionalSeqMatches" + SourceFile.ROW_DELIMITER
+              + "AdditionalSeqPositions" + SourceFile.ROW_DELIMITER;
         }
 
         if (isHasTwoSenses()) {
-            senseColumn = "Sense" + SourceFile.getROW_DELIMITER();
+            senseColumn = "Sense" + SourceFile.ROW_DELIMITER;
         }
 
         //StemLoop.COLUMN_VARS.sort(null);
         return header
-                + "LoopPattern" + SourceFile.getROW_DELIMITER()
-                + "TerminalPair" + SourceFile.getROW_DELIMITER()
-                + "N-2" + SourceFile.getROW_DELIMITER()
-                + "N-1" + SourceFile.getROW_DELIMITER()
-                + "Loop" + SourceFile.getROW_DELIMITER()
-                + "StemLoopSequence" + SourceFile.getROW_DELIMITER()
-                + "Additional5Seq" + SourceFile.getROW_DELIMITER()
-                + "Additional3Seq" + SourceFile.getROW_DELIMITER()
-                + "PredictedStructure" + SourceFile.getROW_DELIMITER()
-                + "ViennaBracketStr" + SourceFile.getROW_DELIMITER()
-                + "Pairments" + SourceFile.getROW_DELIMITER()
-                + "WooblePairs" + SourceFile.getROW_DELIMITER()
-                + "Bulges" + SourceFile.getROW_DELIMITER()
-                + "InternalLoops" + SourceFile.getROW_DELIMITER()
-                + "SequenceLength" + SourceFile.getROW_DELIMITER()
-                + "StartsAt" + SourceFile.getROW_DELIMITER()
-                + "EndsAt" + SourceFile.getROW_DELIMITER()
-                + "A_PercentSequence" + SourceFile.getROW_DELIMITER()
-                + "C_PercentSequence" + SourceFile.getROW_DELIMITER()
-                + "G_PercentSequence" + SourceFile.getROW_DELIMITER()
-                + "U_PercentSequence" + SourceFile.getROW_DELIMITER()
-                + "AU_PercentPairs" + SourceFile.getROW_DELIMITER()
-                + "CG_PercentPairs" + SourceFile.getROW_DELIMITER()
-                + "GU_PercentPairs" + SourceFile.getROW_DELIMITER()
-                + "PurinePercentPairs" + SourceFile.getROW_DELIMITER()
-                + "RnaFoldMFE" + SourceFile.getROW_DELIMITER()
-                + "RelativePosition" + SourceFile.getROW_DELIMITER()
-                + senseColumn
-                + nVariablesTable
-                + additionalSequenceCol
-                + "fornaVisualization" + SourceFile.getROW_DELIMITER();
+          + "LoopPattern" + SourceFile.ROW_DELIMITER
+          + "TerminalPair" + SourceFile.ROW_DELIMITER
+          + "N-2" + SourceFile.ROW_DELIMITER
+          + "N-1" + SourceFile.ROW_DELIMITER
+          + "Loop" + SourceFile.ROW_DELIMITER
+          + "StemLoopSequence" + SourceFile.ROW_DELIMITER
+          + "Additional5Seq" + SourceFile.ROW_DELIMITER
+          + "Additional3Seq" + SourceFile.ROW_DELIMITER
+          + "PredictedStructure" + SourceFile.ROW_DELIMITER
+          + "ViennaBracketStr" + SourceFile.ROW_DELIMITER
+          + "Pairments" + SourceFile.ROW_DELIMITER
+          + "WooblePairs" + SourceFile.ROW_DELIMITER
+          + "Bulges" + SourceFile.ROW_DELIMITER
+          + "InternalLoops" + SourceFile.ROW_DELIMITER
+          + "SequenceLength" + SourceFile.ROW_DELIMITER
+          + "StartsAt" + SourceFile.ROW_DELIMITER
+          + "EndsAt" + SourceFile.ROW_DELIMITER
+          + "A_PercentSequence" + SourceFile.ROW_DELIMITER
+          + "C_PercentSequence" + SourceFile.ROW_DELIMITER
+          + "G_PercentSequence" + SourceFile.ROW_DELIMITER
+          + "U_PercentSequence" + SourceFile.ROW_DELIMITER
+          + "AU_PercentPairs" + SourceFile.ROW_DELIMITER
+          + "CG_PercentPairs" + SourceFile.ROW_DELIMITER
+          + "GU_PercentPairs" + SourceFile.ROW_DELIMITER
+          + "PurinePercentPairs" + SourceFile.ROW_DELIMITER
+          + "RnaFoldMFE" + SourceFile.ROW_DELIMITER
+          + "RelativePosition" + SourceFile.ROW_DELIMITER
+          + senseColumn
+          + nVariablesTable
+          + additionalSequenceCol
+          + "fornaVisualization" + SourceFile.ROW_DELIMITER;
     }
 
     /**
@@ -418,7 +427,7 @@ public class StemLoop {
         }
 
         return this.getPredecessorLoop() + theLoop
-                + "(" + terminal + ")|" + this.getPairments();
+          + "(" + terminal + ")|" + this.getPairments();
     }
 
     /**
@@ -633,7 +642,7 @@ public class StemLoop {
     }
 
     public void setLocation(int pos) {
-        ((GenBankID) getId_fasta()).setLocation(pos);
+        ((GenBank) getId_fasta()).setLocation(pos);
     }
 
     /**
@@ -662,7 +671,7 @@ public class StemLoop {
             int firstDer = this.getViennaStructure().indexOf(')');
 
             for (int i = firstIzq; i >= 0 && firstDer
-                    < getViennaStructure().length(); i--) {
+              < getViennaStructure().length(); i--) {
                 if (getViennaStructure().charAt(i) == '(') {
                     while (getViennaStructure().charAt(firstDer) != ')') {
                         firstDer++;
@@ -670,20 +679,20 @@ public class StemLoop {
 
                     if (getViennaStructure().charAt(firstDer) == ')') {
                         if (SequenceAnalizer.isComplementaryRNAWooble(
-                                seq.charAt(i), seq.charAt(firstDer))) {
+                          seq.charAt(i), seq.charAt(firstDer))) {
                             aux.setCharAt(i, '{');
                             aux.setCharAt(firstDer, '}');
                             woobleCount++;
                         } else {
                             if ((seq.charAt(i) == 'U' && seq.charAt(firstDer) == 'A')
-                                    || (seq.charAt(i) == 'A'
-                                    && seq.charAt(firstDer) == 'U')) {
+                              || (seq.charAt(i) == 'A'
+                              && seq.charAt(firstDer) == 'U')) {
                                 AU++;
                             }
 
                             if ((seq.charAt(i) == 'C' && seq.charAt(firstDer) == 'G')
-                                    || (seq.charAt(i) == 'G'
-                                    && seq.charAt(firstDer) == 'C')) {
+                              || (seq.charAt(i) == 'G'
+                              && seq.charAt(firstDer) == 'C')) {
                                 CG++;
                             }
                         }
@@ -720,14 +729,15 @@ public class StemLoop {
         for (int i = 0; (auxI - i) >= 0 && (aux + i) < len; i++) {
 
             if (auxStruct.charAt(auxI - i) == 'a'
-                    && auxStruct.charAt(aux + i) == 'a') {
+              && auxStruct.charAt(aux + i) == 'a') {
                 this.setInternalLoops(this.getInternalLoops() + 1);
-            } else if ((auxStruct.charAt(auxI - i) == 'a'
-                    && auxStruct.charAt(aux + i) != 'a')
-                    || (auxStruct.charAt(auxI - i) != 'a'
-                    && auxStruct.charAt(aux + i) == 'a')) {
-                this.setBulge(this.getBulge() + 1);
-            }
+            } else
+                if ((auxStruct.charAt(auxI - i) == 'a'
+                  && auxStruct.charAt(aux + i) != 'a')
+                  || (auxStruct.charAt(auxI - i) != 'a'
+                  && auxStruct.charAt(aux + i) == 'a')) {
+                    this.setBulge(this.getBulge() + 1);
+                }
         }
     }
 
@@ -738,10 +748,10 @@ public class StemLoop {
     public void setNLoop(int startPosLoop) {
 
         char precedes = ' ',
-                precedes2 = ' ';
+          precedes2 = ' ';
         int matchFirst,
-                matchLast,
-                startPos;
+          matchLast,
+          startPos;
 
         startPos = startPosLoop;
 
@@ -858,7 +868,7 @@ public class StemLoop {
         for (int i = 0; i < size; i++) {
 
             if ((aux.charAt(i) == 'A' && aux.charAt(aux.length() - 1 - i) == 'U')
-                    || (aux.charAt(i) == 'U' && aux.charAt(aux.length() - 1 - i) == 'A')) {
+              || (aux.charAt(i) == 'U' && aux.charAt(aux.length() - 1 - i) == 'A')) {
                 count++;
             }
         }
@@ -881,7 +891,7 @@ public class StemLoop {
         for (int i = 0; i < size; i++) {
 
             if ((aux.charAt(i) == 'C' && aux.charAt(aux.length() - 1 - i) == 'G')
-                    || (aux.charAt(i) == 'G' && aux.charAt(aux.length() - 1 - i) == 'C')) {
+              || (aux.charAt(i) == 'G' && aux.charAt(aux.length() - 1 - i) == 'C')) {
                 count++;
             }
         }
@@ -927,7 +937,7 @@ public class StemLoop {
      *
      * @param locations
      */
-    public void setAdditionalSeqLocations(List<Integer> locations) {
+    public void setAdditionalSeqLocations(final List<Integer> locations) {
         this.additionalSeqLocations = locations;
     }
 
@@ -943,7 +953,7 @@ public class StemLoop {
      *
      * @param sequenceLength
      */
-    public void setSequenceLength(int sequenceLength) {
+    public void setSequenceLength(final int sequenceLength) {
         this.sequenceLength = sequenceLength;
     }
 
@@ -962,16 +972,16 @@ public class StemLoop {
     public void setTags(String id) {
         switch (this.getMode()) {
             case ENSEMBL:
-                ((EnsemblFastaID) getId_fasta()).setEnsemblTags(id);
+                ((EnsemblFasta) getId_fasta()).setEnsemblTags(id);
                 break;
             case FLYBASE:
-                ((FlyBaseFastaID) getId_fasta()).setFlyBaseTags(id);
+                ((FlyBaseFasta) getId_fasta()).setFlyBaseTags(id);
                 break;
             case BIOMART:
-                ((BioMartFastaID) getId_fasta()).setBioMartTags(id);
+                ((BioMartFasta) getId_fasta()).setBioMartTags(id);
                 break;
             case GENERIC:
-                ((GenericID) getId_fasta()).setGenericTags(id);
+                ((Generic) getId_fasta()).setGenericTags(id);
                 break;
         }
     }
@@ -985,13 +995,13 @@ public class StemLoop {
      * @param cds
      */
     public void setTags(String gene, String synonym, String transcript,
-            String description,
-            String cds) {
+      String description,
+      String cds) {
         getId_fasta().setGeneID(gene);
         getId_fasta().setTranscriptID(transcript);
-        ((GenBankID) getId_fasta()).setDescription(description);
-        ((GenBankID) getId_fasta()).setCDS(cds);
-        ((GenBankID) getId_fasta()).setSynonym(synonym);
+        ((GenBank) getId_fasta()).setDescription(description);
+        ((GenBank) getId_fasta()).setCDS(cds);
+        ((GenBank) getId_fasta()).setSynonym(synonym);
     }
 
     /**
@@ -1001,11 +1011,11 @@ public class StemLoop {
     @Override
     public String toString() {
         return "{" + this.id_fasta.getGeneID() + "; "
-                + this.startsAt + "; "
-                + this.endsAt + "; "
-                + this.loop + "; "
-                + this.rnaHairpinSequence + "; "
-                + this.viennaStructure + "}";
+          + this.startsAt + "; "
+          + this.endsAt + "; "
+          + this.loop + "; "
+          + this.rnaHairpinSequence + "; "
+          + this.viennaStructure + "}";
     }
 
     /**
@@ -1017,11 +1027,11 @@ public class StemLoop {
         String nVariablesValues = "";
         String additionalSeqValues = "";
         String senseValue = "";
-        String fornaSequence = 
-                "http://nibiru.tbi.univie.ac.at/forna/forna.html?id=fasta&file=>"  
-                + this.getGeneSymbol()
-                + "\\n" + this.rnaHairpinSequence 
-                + "\\n" + this.viennaStructure;
+        String fornaSequence
+          = "http://nibiru.tbi.univie.ac.at/forna/forna.html?id=fasta&file=>"
+          + this.getGeneSymbol()
+          + "\\n" + this.rnaHairpinSequence
+          + "\\n" + this.viennaStructure;
         String aux;
         boolean stop;
 
@@ -1036,59 +1046,59 @@ public class StemLoop {
                 }
             }
 
-            nVariablesValues += aux + SourceFile.getROW_DELIMITER();
+            nVariablesValues += aux + SourceFile.ROW_DELIMITER;
         }
-        
-        if(isHasAdditionalSequence()){
-            additionalSeqValues = this.getAdditionalSequenceCount() 
-                    + SourceFile.getROW_DELIMITER()
-                + this.getAdditionalSequenceLocations() 
-                    + SourceFile.getROW_DELIMITER();
+
+        if (isHasAdditionalSequence()) {
+            additionalSeqValues = this.getAdditionalSequenceCount()
+              + SourceFile.ROW_DELIMITER
+              + this.getAdditionalSequenceLocations()
+              + SourceFile.ROW_DELIMITER;
         }
-        
-        if(isHasTwoSenses()){
-            senseValue = this.isReverse() + SourceFile.getROW_DELIMITER();
+
+        if (isHasTwoSenses()) {
+            senseValue = this.isReverse() + SourceFile.ROW_DELIMITER;
         }
 
         return this.getId_fasta().toRowCSV()
-                + this.getLoopPattern() + SourceFile.getROW_DELIMITER()
-                + this.getTerminalPair() + SourceFile.getROW_DELIMITER()
-                + this.getPredecessor2Loop() + SourceFile.getROW_DELIMITER() //n-2
-                + this.getPredecessorLoop() + SourceFile.getROW_DELIMITER()
-                + this.getLoop() + SourceFile.getROW_DELIMITER()
-                + this.getRnaHairpinSequence() + SourceFile.getROW_DELIMITER()
-                + this.getAdditional5Seq() + SourceFile.getROW_DELIMITER()
-                + this.getAdditional3Seq() + SourceFile.getROW_DELIMITER()
-                + this.getHairpinStructure() + SourceFile.getROW_DELIMITER()
-                + this.getStructure() + SourceFile.getROW_DELIMITER()
-                + this.getPairments() + SourceFile.getROW_DELIMITER() /* para que me de apareamientos */
-                + this.getGUPairs() + SourceFile.getROW_DELIMITER()
-                + this.getMismatches() + SourceFile.getROW_DELIMITER()
-                + this.getInternalLoops() + SourceFile.getROW_DELIMITER()
-                + this.getSequenceLength() + SourceFile.getROW_DELIMITER()
-                + this.getStartsAt() + SourceFile.getROW_DELIMITER()
-                + this.getEndsAt() + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercA_sequence()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercC_sequence()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercG_sequence()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercU_sequence()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercent_AU()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercent_CG()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercent_GU()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getPercent_AG()) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getMfe(), 5) + SourceFile.getROW_DELIMITER()
-                + getFormattedNumber(this.getRelativePos()) + SourceFile.getROW_DELIMITER()
-                + senseValue
-                + nVariablesValues
-                + additionalSeqValues
-                + fornaSequence + SourceFile.getROW_DELIMITER();
+          + this.getLoopPattern() + SourceFile.ROW_DELIMITER
+          + this.getTerminalPair() + SourceFile.ROW_DELIMITER
+          + this.getPredecessor2Loop() + SourceFile.ROW_DELIMITER //n-2
+          + this.getPredecessorLoop() + SourceFile.ROW_DELIMITER
+          + this.getLoop() + SourceFile.ROW_DELIMITER
+          + this.getRnaHairpinSequence() + SourceFile.ROW_DELIMITER
+          + this.getAdditional5Seq() + SourceFile.ROW_DELIMITER
+          + this.getAdditional3Seq() + SourceFile.ROW_DELIMITER
+          + this.getHairpinStructure() + SourceFile.ROW_DELIMITER
+          + this.getStructure() + SourceFile.ROW_DELIMITER
+          + this.getPairments() + SourceFile.ROW_DELIMITER /* para que me de apareamientos */
+          + this.getGUPairs() + SourceFile.ROW_DELIMITER
+          + this.getMismatches() + SourceFile.ROW_DELIMITER
+          + this.getInternalLoops() + SourceFile.ROW_DELIMITER
+          + this.getSequenceLength() + SourceFile.ROW_DELIMITER
+          + this.getStartsAt() + SourceFile.ROW_DELIMITER
+          + this.getEndsAt() + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercA_sequence()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercC_sequence()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercG_sequence()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercU_sequence()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercent_AU()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercent_CG()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercent_GU()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getPercent_AG()) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getMfe(), 5) + SourceFile.ROW_DELIMITER
+          + getFormattedNumber(this.getRelativePos()) + SourceFile.ROW_DELIMITER
+          + senseValue
+          + nVariablesValues
+          + additionalSeqValues
+          + fornaSequence + SourceFile.ROW_DELIMITER;
     }
 
     /**
      * @return the additionalSeqLocations
      */
     public List<Integer> getAdditionalSeqLocations() {
-        return additionalSeqLocations;
+        return Collections.unmodifiableList(additionalSeqLocations);
     }
 
     /**

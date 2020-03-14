@@ -18,7 +18,7 @@
 package com.eljaguar.mvnlaslo.gui;
 
 import com.eljaguar.mvnlaslo.core.LoopMatcher;
-import com.eljaguar.mvnlaslo.io.GenBankID;
+import com.eljaguar.mvnlaslo.io.GenBank;
 import java.io.File;
 import static java.lang.System.out;
 import java.util.LinkedHashMap;
@@ -66,7 +66,7 @@ class GUISwingWorker extends
 
             try {
                 out.print(frame.getCurrentBundle().getString("DOWNLOAD_NCBI"));
-                dnaFile = GenBankID.downLoadSequenceForId(frame.getGeneList());
+                dnaFile = GenBank.downLoadSequenceForId(frame.getGeneList());
 
             } catch (Exception ex) {
                 out.printf(frame.getCurrentBundle().getString("ERROR"),
@@ -84,7 +84,7 @@ class GUISwingWorker extends
             }
 
             // call the file as the first ncbi id
-            pathIn = GenBankID.makeFile(frame.getPathOut(), dnaFile,
+            pathIn = GenBank.makeFile(frame.getPathOut(), dnaFile,
                     frame.getGeneList().get(0).trim());
             out.print(frame.getCurrentBundle().getString("NCBI_DONE"));
 

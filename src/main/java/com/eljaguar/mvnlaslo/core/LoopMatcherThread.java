@@ -17,14 +17,15 @@
  */
 package com.eljaguar.mvnlaslo.core;
 
-import com.opencsv.CSVWriter;
-import com.eljaguar.mvnlaslo.tools.RNAFoldInterface;
-import com.eljaguar.mvnlaslo.io.InputSequence;
-import java.util.Iterator;
 import static com.eljaguar.mvnlaslo.core.SequenceAnalizer.*;
+import com.eljaguar.mvnlaslo.io.InputSequence;
+import com.eljaguar.mvnlaslo.io.Vienna;
 import com.eljaguar.mvnlaslo.tools.OSValidator;
 import com.eljaguar.mvnlaslo.tools.RNAFoldConfiguration;
+import com.eljaguar.mvnlaslo.tools.RNAFoldInterface;
+import com.opencsv.CSVWriter;
 import static java.lang.System.out;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -52,6 +53,7 @@ public class LoopMatcherThread implements Runnable {
     private final ResourceBundle bundle;
     private final int temperature;
     private final boolean avoidLonelyPairs;
+    private final Vienna viennaElement;
 
     /**
      *
@@ -69,10 +71,10 @@ public class LoopMatcherThread implements Runnable {
      * @param avoidLonelyPairs
      */
     public LoopMatcherThread(boolean extendedMode, String additionalSequence,
-            int maxLength, int minLength, DNASequence dnaElement,
-            InputSequence inputType, Iterator<String> patternItr,
-            CSVWriter writer, boolean searchReverse, ResourceBundle bundle,
-            int temperature, boolean avoidLonelyPairs) {
+      int maxLength, int minLength, DNASequence dnaElement,
+      InputSequence inputType, Iterator<String> patternItr,
+      CSVWriter writer, boolean searchReverse, ResourceBundle bundle,
+      int temperature, boolean avoidLonelyPairs) {
 
         final int countThreads;
         this.extendedMode = extendedMode;
@@ -87,13 +89,44 @@ public class LoopMatcherThread implements Runnable {
         this.bundle = bundle;
         this.temperature = temperature;
         this.avoidLonelyPairs = avoidLonelyPairs;
+        this.viennaElement = null;
 
         if (!started) {
             // 2 * n + 1
             countThreads = 2 * OSValidator.getNumberOfCPUCores() + 1;
 
             /*out.println(java.text.MessageFormat.format(bundle
-                    .getString("USING_N_CORES"), new Object[] {countThreads}));*/
+               .getString("USING_N_CORES"), new Object[] {countThreads}));*/
+            SEM = new Semaphore(countThreads);
+            started = true;
+        }
+    }
+
+    public LoopMatcherThread(Vienna viennaElement,
+      int maxLength, int minLength, String additionalSequence,
+      Iterator<String> patternItr, CSVWriter writer, ResourceBundle bundle) {
+
+        final int countThreads;
+        this.extendedMode = false;
+        this.additionalSequence = additionalSequence;
+        this.maxLength = maxLength;
+        this.minLength = minLength;
+        this.inputType = InputSequence.VIENNA;
+        this.dnaElement = null;
+        this.patternItr = patternItr;
+        this.writer = writer;
+        this.searchReverse = false;
+        this.bundle = bundle;
+        this.temperature = 37;
+        this.avoidLonelyPairs = false;
+        this.viennaElement = viennaElement;
+
+        if (!started) {
+            // 2 * n + 1
+            countThreads = 2 * OSValidator.getNumberOfCPUCores() + 1;
+
+            /*out.println(java.text.MessageFormat.format(bundle
+               .getString("USING_N_CORES"), new Object[] {countThreads}));*/
             SEM = new Semaphore(countThreads);
             started = true;
         }
@@ -106,140 +139,163 @@ public class LoopMatcherThread implements Runnable {
         return bundle;
     }
 
+    private void runNormalMode(String currentPattern) {
+        SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern,
+          getWriter(), false, getMaxLength(), getMinLength(),
+          getInputType(), getAdditionalSequence(), temperature,
+          avoidLonelyPairs);
+
+        if (isSearchReverse()) {
+            SequenceAnalizer.sequenceResearch(getDnaElement(),
+              currentPattern, getWriter(), true, getMaxLength(),
+              getMinLength(), getInputType(),
+              getAdditionalSequence(), temperature,
+              avoidLonelyPairs);
+        }
+    }
+
+    private void runViennaMode(String currentPattern) {
+        SequenceAnalizer.sequenceResearch(viennaElement, currentPattern, writer,
+          false, maxLength, minLength, additionalSequence);
+    }
+
+    private void runExtendedMode(RNAFoldInterface fold, String currentPattern) {
+        try {
+            getSEM().acquire();
+            sequenceExtendedResearch(getDnaElement(),
+              fold.getStructure(),
+              currentPattern, getWriter(), false, getMaxLength(),
+              getMinLength(), getInputType(),
+              getAdditionalSequence(), temperature,
+              avoidLonelyPairs);
+        } catch (InterruptedException ex) {
+            String msg = "#";
+
+            if (ex.getLocalizedMessage() != null) {
+                msg += ex.getLocalizedMessage() + " - ";
+            }
+            if (ex.getMessage() != null) {
+                msg += ex.getMessage() + " - ";
+            }
+
+            out.println(java.text.MessageFormat.format(
+              getBundle()
+                .getString("ERROR_EX"), new Object[]{msg}));
+            out.println("1-Exception: " + ex.toString());
+        } finally {
+            getSEM().release();
+        }
+
+        if (isSearchReverse()) {
+            try {
+                getSEM().acquire();
+                sequenceExtendedResearch(getDnaElement(),
+                  fold.getStructure(),
+                  currentPattern, getWriter(), true, getMaxLength(),
+                  getMinLength(), getInputType(),
+                  getAdditionalSequence(), temperature,
+                  avoidLonelyPairs);
+
+            } catch (InterruptedException ex) {
+                String msg = "#";
+
+                if (ex.getLocalizedMessage() != null) {
+                    msg += ex.getLocalizedMessage() + " - ";
+                }
+                if (ex.getMessage() != null) {
+                    msg += ex.getMessage() + " - ";
+                }
+
+                out.println(java.text.MessageFormat.format(
+                  getBundle()
+                    .getString("ERROR_EX"), new Object[]{msg}));
+                out.println("2-Exception: " + ex.toString());
+            } finally {
+                getSEM().release();
+            }
+        }
+    }
+
+    private RNAFoldInterface checkExtendedMode() {
+        RNAFoldInterface fold;
+        String sequence = getDnaElement().getRNASequence()
+          .getSequenceAsString();
+        String idSeq = getDnaElement().getAccession().getID() + " - "
+          + getDnaElement().getAccession().getID();
+
+        try {
+
+            if (sequence.length() >= RNAFoldConfiguration.SEQUENCE_MAX_SIZE) {
+                String idAux;
+
+                if (idSeq == null) {
+                    idAux = "*";
+                } else {
+                    if (idSeq.length() > 15) {
+                        idAux = idSeq.substring(0, 14);
+                    } else {
+                        idAux = idSeq;
+                    }
+                }
+
+                out.println(idAux + " - Error: Provided sequence exceeds size limit of "
+                  + RNAFoldConfiguration.SEQUENCE_MAX_SIZE + " nt.");
+                getLatch().countDown();
+                return null;
+            }
+
+            fold = new RNAFoldInterface(sequence, temperature, avoidLonelyPairs);
+
+        } catch (Exception ex) {
+            out.println("[" + idSeq + "] Error. Sequence Length: "
+              + sequence.length());
+
+            if (ex.getMessage() != null) {
+                if (ex.getMessage().length() > 0) {
+                    out.println(this.dnaElement.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+                } else {
+                    out.println(this.dnaElement.getAccession() + " - RNAFold unknown error.");
+                }
+            }
+
+            return null;
+        }
+
+        if (fold.gotError()) {
+            out.println("**RNAFold error**");
+            return null;
+        }
+
+        return fold;
+    }
+
     /**
      *
      */
     @Override
     public void run() {
 
-        boolean gotError = false;
         RNAFoldInterface fold = new RNAFoldInterface();
-        String sequence = getDnaElement().getRNASequence()
-                .getSequenceAsString();
-        String idSeq = getDnaElement().getAccession().getID() + " - "
-                + getDnaElement().getAccession().getID();
+        String currentPattern;
 
         // sólo para modo dos
         if (isExtendedMode()) {
-            try {
-
-                if (sequence.length() >= RNAFoldConfiguration.SEQUENCE_MAX_SIZE) {
-                    String idAux;
-
-                    if (idSeq == null) {
-                        idAux = "*";
-                    } else {
-                        if (idSeq.length() > 15) {
-                            idAux = idSeq.substring(0, 14);
-                        } else {
-                            idAux = idSeq;
-                        }
-                    }
-
-                    out.println(idAux + " - Error: Provided sequence exceeds size limit of "
-                            + RNAFoldConfiguration.SEQUENCE_MAX_SIZE + " nt.");
-                    getLatch().countDown();
-                    return;
-                }
-
-                fold = new RNAFoldInterface(sequence, temperature, avoidLonelyPairs);
-
-            } catch (Exception ex) {
-                gotError = true;
-                out.println("[" + idSeq + "] Error. Sequence Length: "
-                        + sequence.length());
-
-                if (ex.getMessage() != null) {
-                    if (ex.getMessage().length() > 0) {
-                        out.println(this.dnaElement.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
-                    } else {
-                        out.println(this.dnaElement.getAccession() + " - RNAFold unknown error.");
-                    }
-                }
-            }
-
-            if (fold.gotError()) {
-                out.println("**RNAFold error**");
-                gotError = true;
-            }
+            fold = checkExtendedMode();
         }
         // III. Loop level
-        while (getPatternItr().hasNext() && !gotError) {
+        while (null != fold && getPatternItr().hasNext()) {
 
-            String currentPattern = getPatternItr().next().trim().toUpperCase();
+            currentPattern = getPatternItr().next().trim().toUpperCase();
 
             // 1. Stem research
-            if (isExtendedMode()) {
-
-                try {
-                    getSEM().acquire();
-                    sequenceExtendedResearch(getDnaElement(),
-                            fold.getStructure(),
-                            currentPattern, getWriter(), false, getMaxLength(),
-                            getMinLength(), getInputType(),
-                            getAdditionalSequence(), temperature,
-                            avoidLonelyPairs);
-                } catch (InterruptedException ex) {
-                    String msg = "#";
-
-                    if (ex.getLocalizedMessage() != null) {
-                        msg += ex.getLocalizedMessage() + " - ";
-                    }
-                    if (ex.getMessage() != null) {
-                        msg += ex.getMessage() + " - ";
-                    }
-
-                    out.println(java.text.MessageFormat.format(
-                            getBundle()
-                                    .getString("ERROR_EX"), new Object[]{msg}));
-                    out.println("1-Exception: " + ex.toString());
-                } finally {
-                    getSEM().release();
-                }
-
-                if (isSearchReverse()) {
-                    try {
-                        getSEM().acquire();
-                        sequenceExtendedResearch(getDnaElement(),
-                                fold.getStructure(),
-                                currentPattern, getWriter(), true, getMaxLength(),
-                                getMinLength(), getInputType(),
-                                getAdditionalSequence(), temperature,
-                                avoidLonelyPairs);
-
-                    } catch (InterruptedException ex) {
-                        String msg = "#";
-
-                        if (ex.getLocalizedMessage() != null) {
-                            msg += ex.getLocalizedMessage() + " - ";
-                        }
-                        if (ex.getMessage() != null) {
-                            msg += ex.getMessage() + " - ";
-                        }
-
-                        out.println(java.text.MessageFormat.format(
-                                getBundle()
-                                        .getString("ERROR_EX"), new Object[]{msg}));
-                        out.println("2-Exception: " + ex.toString());
-                    } finally {
-                        getSEM().release();
-                    }
-                }
+            if (this.inputType == InputSequence.VIENNA) {
+                runViennaMode(currentPattern);
             } else {
-
-                SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern,
-                        getWriter(), false, getMaxLength(), getMinLength(),
-                        getInputType(), getAdditionalSequence(), temperature,
-                        avoidLonelyPairs);
-
-                if (isSearchReverse()) {
-                    SequenceAnalizer.sequenceResearch(getDnaElement(),
-                            currentPattern, getWriter(), true, getMaxLength(),
-                            getMinLength(), getInputType(),
-                            getAdditionalSequence(), temperature,
-                            avoidLonelyPairs);
+                if (isExtendedMode()) {
+                    runExtendedMode(fold, currentPattern);
+                } else {
+                    runNormalMode(currentPattern);
                 }
-
             }
         }
 

@@ -33,7 +33,7 @@ import org.biojava.nbio.core.sequence.io.GenbankWriterHelper;
  *
  * @author David A. Mancilla
  */
-public class GenBankID extends SourceFile {
+public class GenBank extends SourceFile {
 
     private String description;
     private int cdsStart;
@@ -45,18 +45,18 @@ public class GenBankID extends SourceFile {
     private final static String E_FETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?";
 
     private static String HEADER
-            = "Gen" + getROW_DELIMITER()
-            + "GeneSynonym" + getROW_DELIMITER()
-            + "Note" + getROW_DELIMITER()
-            + "AccessionID" + getROW_DELIMITER()
-            + "CDS_Start" + getROW_DELIMITER()
-            + "CDS_End" + getROW_DELIMITER()
-            + "Location" + getROW_DELIMITER();
+            = "Gen" + ROW_DELIMITER
+            + "GeneSynonym" + ROW_DELIMITER
+            + "Note" + ROW_DELIMITER
+            + "AccessionID" + ROW_DELIMITER
+            + "CDS_Start" + ROW_DELIMITER
+            + "CDS_End" + ROW_DELIMITER
+            + "Location" + ROW_DELIMITER;
 
     /**
      * Blank constructor.
      */
-    public GenBankID() {
+    public GenBank() {
         this.description = "";
         this.cdsStart = 0;
         this.cdsEnd = 0;
@@ -70,7 +70,7 @@ public class GenBankID extends SourceFile {
      * @param cdsStart
      * @param cdsEnd
      */
-    public GenBankID(String synonym, String description, int cdsStart,
+    public GenBank(String synonym, String description, int cdsStart,
             int cdsEnd) {
         this.description = description;
         this.cdsStart = cdsStart;
@@ -261,7 +261,7 @@ public class GenBankID extends SourceFile {
             LinkedHashMap<String, DNASequence> downLoadSequenceForId;
             downLoadSequenceForId = downLoadSequenceForId("NM_001275794.1,NM_005690");
         } catch (Exception ex) {
-            Logger.getLogger(GenBankID.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GenBank.class.getName()).log(Level.SEVERE, null, ex);
         }*/
     }
 
@@ -360,7 +360,7 @@ public class GenBankID extends SourceFile {
      * @return
      */
     public static String getHeader() {
-        return GenBankID.getHEADER();
+        return GenBank.getHEADER();
     }
 
     /**
@@ -369,13 +369,13 @@ public class GenBankID extends SourceFile {
      */
     @Override
     public String toRowCSV() {
-        return getGeneID().replace(';', ',') + getROW_DELIMITER()
-                + getSynonym() + getROW_DELIMITER()
-                + getTranscriptID().replace(';', ',') + getROW_DELIMITER()
-                + getDescription() + getROW_DELIMITER()
-                + getCdsStart() + getROW_DELIMITER()
-                + getCdsEnd() + getROW_DELIMITER()
-                + getLocation() + getROW_DELIMITER();
+        return getGeneID().replace(';', ',') + ROW_DELIMITER
+                + getSynonym() + ROW_DELIMITER
+                + getTranscriptID().replace(';', ',') + ROW_DELIMITER
+                + getDescription() + ROW_DELIMITER
+                + getCdsStart() + ROW_DELIMITER
+                + getCdsEnd() + ROW_DELIMITER
+                + getLocation() + ROW_DELIMITER;
     }
 
     /**

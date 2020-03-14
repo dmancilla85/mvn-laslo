@@ -17,9 +17,10 @@
  */
 package com.eljaguar.mvnlaslo.core;
 
-import com.opencsv.CSVWriter;
-import com.eljaguar.mvnlaslo.tools.RNAFoldInterface;
 import com.eljaguar.mvnlaslo.io.InputSequence;
+import com.eljaguar.mvnlaslo.io.Vienna;
+import com.eljaguar.mvnlaslo.tools.RNAFoldInterface;
+import com.opencsv.CSVWriter;
 import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -69,7 +70,7 @@ public class SequenceAnalizer {
      */
     @SuppressWarnings({"empty-statement", "ValueOfIncrementOrDecrementUsed"})
     public static String isValidHairpin(int minLength, String hairpin,
-            int loopLength, int loopPos, String seq) {
+      int loopLength, int loopPos, String seq) {
 
         boolean ret;
         boolean begin = true, cut = true;
@@ -83,16 +84,16 @@ public class SequenceAnalizer {
         // Pasos
         // 0. Verificar que esten los 3 simbolos
         ret = hairpin.indexOf('.') >= 0 && hairpin.indexOf('(') >= 0
-                && hairpin.indexOf(')') >= 0;
+          && hairpin.indexOf(')') >= 0;
 
         // 1. Verificar que en la posición del loop no haya brackets
         ret = ret && hairpin.substring(stemLength, stemLength + loopLength)
-                .replaceAll("\\.", "").length() == 0; //NOI18N
+          .replaceAll("\\.", "").length() == 0; //NOI18N
 
         // 1'. Verificar que haya un cierre
         if (ret) {
             ret = hairpin.charAt(stemLength - 1) == '('
-                    && hairpin.charAt(stemLength + loopLength) == ')';
+              && hairpin.charAt(stemLength + loopLength) == ')';
         }
 
         // 2. Analizar lado izq. y derecho del stem desde extremo 5',
@@ -134,7 +135,7 @@ public class SequenceAnalizer {
                 //		(stemLength-1)
                 // Repetir 2.b hasta que complete el recorrido. 	
                 extremoDer = hairpin_.substring(extremoIzq.length() + loopLength,
-                        hairpin_.length());
+                  hairpin_.length());
 
                 int cLeft = StringUtils.countMatches(extremoIzq, "(");
                 int cRight = 0;
@@ -168,7 +169,7 @@ public class SequenceAnalizer {
                     return "";
                 } else {
                     hairpin_ = hairpin_.substring(0, extremoIzq.length()
-                            + loopLength + posPar + 1);
+                      + loopLength + posPar + 1);
                 }
 
                 int auxR = StringUtils.countMatches(hairpin_, ")");
@@ -191,8 +192,8 @@ public class SequenceAnalizer {
 
             } catch (IndexOutOfBoundsException e) {
                 out.println(java.text.MessageFormat.format(
-                        getBundle()
-                                .getString("ERROR_EX"), new Object[]{e.getMessage()}));
+                  getBundle()
+                    .getString("ERROR_EX"), new Object[]{e.getMessage()}));
                 out.println("*Method: IsValidHairpin*");
             }
         }
@@ -202,6 +203,208 @@ public class SequenceAnalizer {
             return ""; //NOI18N
         }
         return hairpin_;
+    }
+
+    /**
+     * Analize the sequence to find potential stem-loop structures
+     * <p>
+     * <b>Implementation details: * It calls RNAFoldInterface</b>
+     * Note: Check if mutEx are working well.
+     * </p>
+     *
+     * @param vienna
+     * @param stemLoopPattern
+     * @param writer
+     * @param invert
+     * @param maxLength
+     * @param minLength
+     * @param additionalSeq
+     * @return The number of valids stem-loops detected
+     */
+    public static synchronized int sequenceResearch(Vienna vienna,
+      String stemLoopPattern, CSVWriter writer, boolean invert,
+      int maxLength, int minLength, String additionalSeq) {
+
+        List<StemLoop> slrList = new ArrayList<>();
+        StemLoop slr;
+        int size;
+        int posAux;
+        int k = 1;
+        int loopPos;
+        int sequenceLength;
+        int loopLength = stemLoopPattern.length();
+        boolean isValidHairpin;
+        String rnaSequence;
+        String stemLoop;
+        String rnaLoop;
+        String rnaSeq;
+        String hairpinModel;
+        hairpinModel = "";
+        rnaSequence = vienna.getSequence().toUpperCase();
+        sequenceLength = rnaSequence.length();
+
+        stemLoop = invert ? reverseIt(stemLoopPattern) : stemLoopPattern;
+
+        // Convert the original loop pattern to a regular expression
+        String regExp = toRegularExpression(stemLoop);
+        Pattern p = Pattern.compile(regExp);
+        Matcher loopFinder = p.matcher(rnaSequence);
+
+        // As exists loop matches
+        while (loopFinder.find()) {
+            loopPos = loopFinder.start();
+            isValidHairpin = true;
+            rnaLoop = rnaSequence.substring(loopPos, loopFinder.end());
+
+            int length = maxLength;
+            slr = new StemLoop(InputSequence.VIENNA);
+
+            try {  // 1. extract the full stem-loop sequence
+                // check left border length
+                if (loopPos - length < 0 && loopPos > minLength) {
+                    length = loopPos;
+                }
+
+                // check right border length
+                if ((loopPos + loopLength + length) >= sequenceLength) {
+                    length = sequenceLength - loopPos - loopLength;
+                }
+
+                if ((loopPos - length) > 0
+                  && (loopPos + loopLength + length) < sequenceLength) {
+                    rnaSeq = rnaSequence.substring(loopPos - length,
+                      loopPos + loopLength + length);
+                    hairpinModel = vienna.getBrackets().substring(loopPos - length,
+                      loopPos + loopLength + length);
+                    // 2.a first validation of 1st loop close pairs
+                    isValidHairpin = isRNAPair(rnaSequence.charAt(loopPos - 1),
+                      rnaSequence.charAt(loopPos + rnaLoop.length()));
+
+                    // 2.b Validation of 2nd loop close pairs
+                    if (isValidHairpin) {
+                        isValidHairpin
+                          = isRNAPair(rnaSequence.charAt(loopPos - 2),
+                            rnaSequence.charAt(loopPos + rnaLoop.length()
+                              + 1));
+                    }
+
+                    // 3. Continue validation
+                    if (isValidHairpin) {
+
+                        if (rnaSeq.length() != hairpinModel.length()) {
+                            out.printf(getBundle().getString("ERRORNOTMATCHING"),
+                              rnaSeq, hairpinModel);
+                        }
+                        // check minimum free energy, must be < 0
+                        if (vienna.getMfe() >= 0.0) {
+                            isValidHairpin = false;
+                        } else {
+                            // verify hairpin structure
+                            hairpinModel = isValidHairpin(minLength,
+                              hairpinModel, loopLength, loopPos, rnaSeq);
+                            isValidHairpin = hairpinModel.length() > 0;
+                        }
+                    }
+                } else { // stem-loop out of bounds
+                    isValidHairpin = false;
+                }
+
+            } catch (Exception e) {
+                out.println(java.text.MessageFormat.format(
+                  getBundle()
+                    .getString("ERROR_EX"), new Object[]{e.getMessage()}));
+                out.println("*Method: sequenceResearch*");
+            }
+
+            // extract output variables from the sequence
+            if (isValidHairpin) {
+                int extIzq = hairpinModel.lastIndexOf("(") + 1; //NOI18N
+                int extDer = hairpinModel.length() - extIzq - loopLength;
+
+                posAux = loopPos - extIzq;
+                rnaSeq = rnaSequence.substring(posAux, loopPos
+                  + loopLength + extDer);
+
+                // Fill the fields
+                try {
+                    slr.setAdditional5Seq(rnaSequence
+                      .substring(posAux - k, posAux));
+                    slr.setAdditional3Seq(rnaSequence.substring(posAux
+                      + rnaSeq.length(), posAux + rnaSeq.length() + k));
+                } catch (IndexOutOfBoundsException e) {
+                    slr.setAdditional3Seq("");
+                    slr.setAdditional5Seq("");
+                }
+
+                slr.setReverse(invert);
+                slr.setRnaHairpinSequence(rnaSeq);
+
+                if (!invert) {
+                    slr.setLoopPattern(stemLoop);
+                } else {
+                    slr.setLoopPattern(reverseIt(stemLoop));
+                }
+
+                slr.setLoop(rnaLoop);
+                slr.setStartsAt(posAux);
+                slr.setStructure(hairpinModel);
+                slr.setSequenceLength(sequenceLength);
+                slr.checkPairments();
+                slr.checkInternalLoops();
+                slr.setMfe(vienna.getMfe());
+                slr.setNLoop(extIzq);
+                slr.setPercent_AG();
+                slr.setEndsAt(loopPos + loopLength + extDer);
+                slr.setPercA_sequence(
+                  (rnaSequence.length() - rnaSequence.replace("A", "")
+                  .length()) / (float) rnaSequence.length());
+                slr.setPercG_sequence(
+                  (rnaSequence.length() - rnaSequence.replace("G", "")
+                  .length()) / (float) rnaSequence.length());
+                slr.setPercC_sequence(
+                  (rnaSequence.length() - rnaSequence.replace("C", "")
+                  .length()) / (float) rnaSequence.length());
+                slr.setPercU_sequence(
+                  (rnaSequence.length() - rnaSequence.replace("U", "")
+                  .length()) / (float) rnaSequence.length());
+
+                if (additionalSeq.trim().length() > 0) {
+                    slr.setAdditionalSeqLocations(
+                      getPatternLocations(rnaSequence,
+                        additionalSeq));
+                }
+
+                slr.setRelativePos(slr.getStartsAt()
+                  / (double) rnaSequence.length());
+
+                // Add element to global list
+                slrList.add(slr);
+            }
+        }
+
+        Iterator<StemLoop> itr = slrList.iterator();
+
+        // Write to file
+        while (itr.hasNext()) {
+            StemLoop element = itr.next();
+
+            try {
+                LoopMatcherThread.getMUTEX().acquire();
+                writer.writeNext(element.toRowCSV().split(";")); //NOI18N
+            } catch (InterruptedException ex) {
+                out.println(java.text.MessageFormat.format(
+                  getBundle()
+                    .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                out.println("*Method: sequenceResearch*MUTEX");
+            } finally {
+                LoopMatcherThread.getMUTEX().release();
+            }
+        }
+
+        size = slrList.size();
+        slrList.clear();
+
+        return size;
     }
 
     /**
@@ -225,9 +428,9 @@ public class SequenceAnalizer {
      * @return The number of valids stem-loops detected
      */
     public static synchronized int sequenceResearch(DNASequence fastaSeq,
-            String stemLoopPattern, CSVWriter writer, boolean invert,
-            int maxLength, int minLength, InputSequence inputType,
-            String additionalSeq, int temperature, boolean avoidLonelyPairs) {
+      String stemLoopPattern, CSVWriter writer, boolean invert,
+      int maxLength, int minLength, InputSequence inputType,
+      String additionalSeq, int temperature, boolean avoidLonelyPairs) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
@@ -281,33 +484,33 @@ public class SequenceAnalizer {
 
                 if (!fastaSeq.getOriginalHeader().contains("@")) {
                     Map qual = ((FeatureInterface) fastaSeq.getFeaturesByType("gene")
-                            .toArray()[0]).getQualifiers();
+                      .toArray()[0]).getQualifiers();
 
                     if (!qual.isEmpty()) {
 
                         try {
                             gene = ((Qualifier) ((List) (qual.get("gene")))
-                                    .get(0)).getValue();
+                              .get(0)).getValue();
                         } catch (Exception e) {
                             gene = "null";
                         }
 
                         try {
                             synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
-                                    .getValue();
+                              .getValue();
                         } catch (Exception e) {
                             synonym = "null";
                         }
 
                         try {
                             note = ((Qualifier) ((List) (qual.get("note"))).get(0))
-                                    .getValue();
+                              .getValue();
                         } catch (Exception e) {
                             note = "null";
                         }
                         id = fastaSeq.getAccession().getID();
                         cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
-                                .toArray()[0]).getSource();
+                          .toArray()[0]).getSource();
                     }
                 } else { // ..must be reviewed..
                     String auxH[] = fastaSeq.getOriginalHeader().split("@");
@@ -332,20 +535,20 @@ public class SequenceAnalizer {
                 }
 
                 if ((loopPos - length) > 0
-                        && (loopPos + loopLength + length) < sequenceLength) {
+                  && (loopPos + loopLength + length) < sequenceLength) {
                     rnaSeq = rnaSequence.substring(loopPos - length,
-                            loopPos + loopLength + length);
+                      loopPos + loopLength + length);
 
                     // 2.a first validation of 1st loop close pairs
                     isValidHairpin = isRNAPair(rnaSequence.charAt(loopPos - 1),
-                            rnaSequence.charAt(loopPos + rnaLoop.length()));
+                      rnaSequence.charAt(loopPos + rnaLoop.length()));
 
                     // 2.b Validation of 2nd loop close pairs
                     if (isValidHairpin) {
                         isValidHairpin
-                                = isRNAPair(rnaSequence.charAt(loopPos - 2),
-                                        rnaSequence.charAt(loopPos + rnaLoop.length()
-                                                + 1));
+                          = isRNAPair(rnaSequence.charAt(loopPos - 2),
+                            rnaSequence.charAt(loopPos + rnaLoop.length()
+                              + 1));
                     }
 
                     // 3. Continue validation
@@ -358,8 +561,8 @@ public class SequenceAnalizer {
 
                         } catch (InterruptedException ex) {
                             out.printf(getBundle().getString("ERROR_CLASE"),
-                                    SequenceAnalizer.class.getClass(),
-                                    ex.getMessage());
+                              SequenceAnalizer.class.getClass(),
+                              ex.getMessage());
                         } finally {
                             LoopMatcherThread.getSEM().release();
                         }
@@ -368,7 +571,7 @@ public class SequenceAnalizer {
 
                         if (rnaSeq.length() != hairpinModel.length()) {
                             out.printf(getBundle().getString("ERRORNOTMATCHING"),
-                                    rnaSeq, hairpinModel);
+                              rnaSeq, hairpinModel);
                         }
                         // check minimum free energy, must be < 0
                         if (fold.getMfe() >= 0.0) {
@@ -376,7 +579,7 @@ public class SequenceAnalizer {
                         } else {
                             // verify hairpin structure
                             hairpinModel = isValidHairpin(minLength,
-                                    hairpinModel, loopLength, loopPos, rnaSeq);
+                              hairpinModel, loopLength, loopPos, rnaSeq);
                             isValidHairpin = hairpinModel.length() > 0;
                         }
                     }
@@ -386,8 +589,8 @@ public class SequenceAnalizer {
 
             } catch (Exception e) {
                 out.println(java.text.MessageFormat.format(
-                        getBundle()
-                                .getString("ERROR_EX"), new Object[]{e.getMessage()}));
+                  getBundle()
+                    .getString("ERROR_EX"), new Object[]{e.getMessage()}));
                 out.println("*Method: sequenceResearch*");
             }
 
@@ -398,14 +601,14 @@ public class SequenceAnalizer {
 
                 posAux = loopPos - extIzq;
                 rnaSeq = rnaSequence.substring(posAux, loopPos
-                        + loopLength + extDer);
+                  + loopLength + extDer);
 
                 // Fill the fields
                 try {
                     slr.setAdditional5Seq(rnaSequence
-                            .substring(posAux - k, posAux));
+                      .substring(posAux - k, posAux));
                     slr.setAdditional3Seq(rnaSequence.substring(posAux
-                            + rnaSeq.length(), posAux + rnaSeq.length() + k));
+                      + rnaSeq.length(), posAux + rnaSeq.length() + k));
                 } catch (IndexOutOfBoundsException e) {
                     slr.setAdditional3Seq("");
                     slr.setAdditional5Seq("");
@@ -445,26 +648,26 @@ public class SequenceAnalizer {
                 slr.setPercent_AG();
                 slr.setEndsAt(loopPos + loopLength + extDer);
                 slr.setPercA_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("A", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("A", "")
+                  .length()) / (float) rnaSequence.length());
                 slr.setPercG_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("G", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("G", "")
+                  .length()) / (float) rnaSequence.length());
                 slr.setPercC_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("C", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("C", "")
+                  .length()) / (float) rnaSequence.length());
                 slr.setPercU_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("U", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("U", "")
+                  .length()) / (float) rnaSequence.length());
 
                 if (additionalSeq.trim().length() > 0) {
                     slr.setAdditionalSeqLocations(
-                            getPatternLocations(rnaSequence,
-                                    additionalSeq));
+                      getPatternLocations(rnaSequence,
+                        additionalSeq));
                 }
 
                 slr.setRelativePos(slr.getStartsAt()
-                        / (double) rnaSequence.length());
+                  / (double) rnaSequence.length());
 
                 // Add element to global list
                 slrList.add(slr);
@@ -482,8 +685,8 @@ public class SequenceAnalizer {
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
                 out.println(java.text.MessageFormat.format(
-                        getBundle()
-                                .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                  getBundle()
+                    .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
                 out.println("*Method: sequenceResearch*MUTEX");
             } finally {
                 LoopMatcherThread.getMUTEX().release();
@@ -500,7 +703,7 @@ public class SequenceAnalizer {
      * Analize the sequence to find potential stem-loop structures
      * <p>
      * <b>Implementation details: * Compares with global prediction * It calls
- RNAFoldInterface</b>
+     * RNAFoldInterface</b>
      * Note: Check if mutEx are working well.
      * </p>
      *
@@ -518,10 +721,10 @@ public class SequenceAnalizer {
      * @return
      */
     public static int sequenceExtendedResearch(DNASequence fastaSeq,
-            String viennaStructure, String stemLoopPattern, CSVWriter writer,
-            boolean invert, int maxLength, int minLength,
-            InputSequence inputType, String additionalSeq, int temperature,
-            boolean avoidLonelyPairs) {
+      String viennaStructure, String stemLoopPattern, CSVWriter writer,
+      boolean invert, int maxLength, int minLength,
+      InputSequence inputType, String additionalSeq, int temperature,
+      boolean avoidLonelyPairs) {
 
         List<StemLoop> slrList = new ArrayList<>();
         StemLoop slr;
@@ -572,34 +775,34 @@ public class SequenceAnalizer {
 
                 if (!fastaSeq.getOriginalHeader().contains("@")) {
                     Map qual = ((FeatureInterface) fastaSeq.getFeaturesByType("gene")
-                            .toArray()[0]).getQualifiers();
+                      .toArray()[0]).getQualifiers();
 
                     if (!qual.isEmpty()) {
 
                         try {
                             gene = ((Qualifier) ((List) (qual.get("gene")))
-                                    .get(0)).getValue();
+                              .get(0)).getValue();
                         } catch (Exception e) {
                             gene = "null";
                         }
 
                         try {
                             synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
-                                    .getValue();
+                              .getValue();
                         } catch (Exception e) {
                             synonym = "null";
                         }
 
                         try {
                             note = ((Qualifier) ((List) (qual.get("note"))).get(0))
-                                    .getValue();
+                              .getValue();
                         } catch (Exception e) {
                             note = "null";
                         }
 
                         id = fastaSeq.getAccession().getID();
                         cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
-                                .toArray()[0]).getSource();
+                          .toArray()[0]).getSource();
                     }
                 } else { // ..must be reviewed..
                     String auxH[] = fastaSeq.getOriginalHeader().split("@");
@@ -625,38 +828,38 @@ public class SequenceAnalizer {
                 }
 
                 if ((loopPos - length) > 0 && length >= minLength
-                        && (loopPos + loopLength + length) <= sequenceLength) {
+                  && (loopPos + loopLength + length) <= sequenceLength) {
                     rnaSeq = rnaSequence.substring(loopPos - length,
-                            loopPos + loopLength + length);
+                      loopPos + loopLength + length);
 
                     // 2.a first validation of 1st loop close pairs
                     isValidHairpin = isRNAPair(rnaSequence.charAt(loopPos - 1),
-                            rnaSequence.charAt(loopPos + rnaLoop.length()));
+                      rnaSequence.charAt(loopPos + rnaLoop.length()));
 
                     // 2.b Validation of 2nd loop close pairs
                     if (isValidHairpin) {
                         isValidHairpin
-                                = isRNAPair(rnaSequence.charAt(loopPos - 2),
-                                        rnaSequence.charAt(loopPos + rnaLoop.length()
-                                                + 1));
+                          = isRNAPair(rnaSequence.charAt(loopPos - 2),
+                            rnaSequence.charAt(loopPos + rnaLoop.length()
+                              + 1));
                     }
 
                     // 3. Continue validation
                     if (isValidHairpin) {
 
                         hairpinModel = viennaStructure
-                                .substring(loopPos - length,
-                                        loopPos + loopLength + length);
+                          .substring(loopPos - length,
+                            loopPos + loopLength + length);
 
                         if (rnaSeq.length() != hairpinModel.length()) {
                             out.printf(getBundle().getString("ERRORNOTMATCHING"),
-                                    rnaSeq, hairpinModel);
+                              rnaSeq, hairpinModel);
                         }
 
                         // check minimum free energy, must be < 0 ..not here..
                         // verify hairpin structure
                         hairpinModel = isValidHairpin(minLength, hairpinModel,
-                                loopLength, loopPos, rnaSeq);
+                          loopLength, loopPos, rnaSeq);
 
                         isValidHairpin = hairpinModel.length() > 0;
                     }
@@ -666,8 +869,8 @@ public class SequenceAnalizer {
 
             } catch (Exception e) {
                 out.println(java.text.MessageFormat.format(
-                        getBundle().getString("ERROR_EX"),
-                        new Object[]{e.getMessage()}));
+                  getBundle().getString("ERROR_EX"),
+                  new Object[]{e.getMessage()}));
                 out.println("*Method: sequenceExtendedResearch*");
             }
 
@@ -676,15 +879,15 @@ public class SequenceAnalizer {
                 int extIzq = hairpinModel.lastIndexOf("(") + 1;
                 int extDer = hairpinModel.length() - extIzq - loopLength;
                 rnaSeq = rnaSequence.substring(loopPos - extIzq, loopPos
-                        + loopLength + extDer);
+                  + loopLength + extDer);
                 posAux = rnaSequence.indexOf(rnaSeq);
 
                 // Fill the fields
                 try {
                     slr.setAdditional5Seq(rnaSequence
-                            .substring(posAux - k, posAux));
+                      .substring(posAux - k, posAux));
                     slr.setAdditional3Seq(rnaSequence.substring(posAux
-                            + rnaSeq.length(), posAux + rnaSeq.length() + k));
+                      + rnaSeq.length(), posAux + rnaSeq.length() + k));
                 } catch (IndexOutOfBoundsException e) {
                     slr.setAdditional3Seq("");
                     slr.setAdditional5Seq("");
@@ -723,26 +926,26 @@ public class SequenceAnalizer {
 
                 slr.setEndsAt(loopFinder.end() + extDer);
                 slr.setPercA_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("A", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("A", "")
+                  .length()) / (float) rnaSequence.length());
                 slr.setPercG_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("G", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("G", "")
+                  .length()) / (float) rnaSequence.length());
                 slr.setPercC_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("C", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("C", "")
+                  .length()) / (float) rnaSequence.length());
                 slr.setPercU_sequence(
-                        (rnaSequence.length() - rnaSequence.replace("U", "")
-                        .length()) / (float) rnaSequence.length());
+                  (rnaSequence.length() - rnaSequence.replace("U", "")
+                  .length()) / (float) rnaSequence.length());
 
                 if (additionalSeq.trim().length() > 0) {
                     slr.setAdditionalSeqLocations(
-                            getPatternLocations(rnaSequence,
-                                    additionalSeq));
+                      getPatternLocations(rnaSequence,
+                        additionalSeq));
                 }
 
                 slr.setRelativePos(slr.getStartsAt()
-                        / (double) rnaSequence.length());
+                  / (double) rnaSequence.length());
 
                 // Add element to global list
                 slrList.add(slr);
@@ -760,7 +963,7 @@ public class SequenceAnalizer {
                 writer.writeNext(element.toRowCSV().split(";")); //NOI18N
             } catch (InterruptedException ex) {
                 out.println(java.text.MessageFormat.format(
-                        getBundle().getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                  getBundle().getString("ERROR_EX"), new Object[]{ex.getMessage()}));
                 out.println("*Method: sequenceExtendedResearch*MUTEX");
             } finally {
                 LoopMatcherThread.getMUTEX().release();
@@ -878,26 +1081,26 @@ public class SequenceAnalizer {
         switch (base1) {
             case 'A':
                 isComplement = (base2 == 'U') || (base2 == 'W')
-                        || (base2 == 'K') || (base2 == 'Y')
-                        || (base2 == 'B') || (base2 == 'D')
-                        || (base2 == 'H') || (base2 == 'V');
+                  || (base2 == 'K') || (base2 == 'Y')
+                  || (base2 == 'B') || (base2 == 'D')
+                  || (base2 == 'H') || (base2 == 'V');
                 break;
             case 'U':
                 isComplement = (base2 == 'A') || (base2 == 'W')
-                        || (base2 == 'M') || (base2 == 'R')
-                        || (base2 == 'D')
-                        || (base2 == 'H') || (base2 == 'V');
+                  || (base2 == 'M') || (base2 == 'R')
+                  || (base2 == 'D')
+                  || (base2 == 'H') || (base2 == 'V');
                 break;
             case 'G':
                 isComplement = (base2 == 'C') || (base2 == 'S')
-                        || (base2 == 'M') || (base2 == 'Y')
-                        || (base2 == 'B')
-                        || (base2 == 'H') || (base2 == 'V');
+                  || (base2 == 'M') || (base2 == 'Y')
+                  || (base2 == 'B')
+                  || (base2 == 'H') || (base2 == 'V');
                 break;
             case 'C':
                 isComplement = (base2 == 'G') || (base2 == 'S')
-                        || (base2 == 'K') || (base2 == 'R')
-                        || (base2 == 'B');
+                  || (base2 == 'K') || (base2 == 'R')
+                  || (base2 == 'B');
                 break;
         }
 
@@ -913,8 +1116,8 @@ public class SequenceAnalizer {
     public static boolean isMismatch(char base1, char base2) {
         boolean isMismatch;
         isMismatch = !isComplementaryDNA(base1, base2)
-                && !isComplementaryRNA(base1, base2)
-                && !isComplementaryRNAWooble(base1, base2);
+          && !isComplementaryRNA(base1, base2)
+          && !isComplementaryRNAWooble(base1, base2);
 
         return isMismatch;
     }
@@ -938,20 +1141,20 @@ public class SequenceAnalizer {
         switch (base1) {
             case 'U':
                 isComplement = (base2 == 'G') || (base2 == 'S')
-                        || (base2 == 'K') || (base2 == 'R')
-                        || (base2 == 'B') || (base2 == 'I');
+                  || (base2 == 'K') || (base2 == 'R')
+                  || (base2 == 'B') || (base2 == 'I');
                 break;
 
             case 'G':
                 isComplement = (base2 == 'U') || (base2 == 'W')
-                        || (base2 == 'K') || (base2 == 'Y')
-                        || (base2 == 'B') || (base2 == 'D')
-                        || (base2 == 'H') || (base2 == 'V');
+                  || (base2 == 'K') || (base2 == 'Y')
+                  || (base2 == 'B') || (base2 == 'D')
+                  || (base2 == 'H') || (base2 == 'V');
                 break;
 
             case 'I':
                 isComplement = (base2 == 'U') || (base2 == 'A')
-                        || (base2 == 'C');
+                  || (base2 == 'C');
                 break;
 
             case 'A':
@@ -992,7 +1195,7 @@ public class SequenceAnalizer {
                     break;
                 default:
                     rnaSequence = rnaSequence.concat(String.valueOf(
-                            dnaSequence.charAt(i))); // test
+                      dnaSequence.charAt(i))); // test
             }
         }
 
@@ -1036,7 +1239,7 @@ public class SequenceAnalizer {
      * @return
      */
     public static int findSlippageSequence(String rnaSequence, String slippage,
-            int nMin) {
+      int nMin) {
 
         int init = 0, n = 0, position = 0, indexOf;
 
@@ -1080,7 +1283,7 @@ public class SequenceAnalizer {
                 base2 = loop.charAt(loop.length() - 1 - i);
 
                 if (SequenceAnalizer.isComplementaryRNAWooble(base1, base2)
-                        || SequenceAnalizer.isComplementaryRNA(base1, base2)) {
+                  || SequenceAnalizer.isComplementaryRNA(base1, base2)) {
                     ret = false;
                 }
             }

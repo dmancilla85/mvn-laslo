@@ -52,5 +52,10 @@ public enum InputSequence {
     /**
      * Generic FASTA used in Random Generation
      */
-    GENBANK_RND
+    GENBANK_RND,
+    
+    /**
+     * Vienna Brackets file
+     */
+    VIENNA
 }

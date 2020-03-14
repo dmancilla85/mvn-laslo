@@ -21,7 +21,7 @@ package com.eljaguar.mvnlaslo.io;
  * @author David A. Mancilla
  *
  */
-public class BioMartFastaID extends SourceFile {
+public class BioMartFasta extends SourceFile {
 
     private static int nCols = 6;
     private static char fs = '|';
@@ -30,7 +30,7 @@ public class BioMartFastaID extends SourceFile {
     /**
      * 
      */
-    public BioMartFastaID(){
+    public BioMartFasta(){
         columns = new String[nCols];
     }
     
@@ -78,7 +78,7 @@ public class BioMartFastaID extends SourceFile {
         String header = "";
 
         for (int i = 0; i < getnCols(); i++) {
-            header += "Column" + (i + 1) + getROW_DELIMITER();
+            header += "Column" + (i + 1) + ROW_DELIMITER;
         }
 
         return header;
@@ -116,7 +116,7 @@ public class BioMartFastaID extends SourceFile {
         int i;
 
         for (i = 0; i < getColumns().length; i++) {
-            row += getColumns()[i] + getROW_DELIMITER();
+            row += getColumns()[i] + ROW_DELIMITER;
         }
 
         return row;

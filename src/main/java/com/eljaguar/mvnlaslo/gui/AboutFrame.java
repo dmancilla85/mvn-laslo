@@ -32,26 +32,26 @@ public class AboutFrame extends javax.swing.JFrame {
      */
     public AboutFrame() {
         aboutText = "LASLO v1.0 - README\n\n"
-                + "Introduction\n"
-                + "Multi-threaded application that searches for hairpin structures in cDNA / mRNA sequences (FASTA or GenBank) with specific consensus sequences in the loop. It implements RNAfold to predict the structure of the sequence, and UShuffle to generate random sequences with conservation of the k-nucleotide frequency.\n"
-                + "\n\n"
-                + "Requirements\n"
-                + "JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences.\n"
-                + "\n"
-                + "Instructions\n"
-                + "Credits and Acknowledgments\n"
-                + "RNAfold 2.4.9 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html\n"
-                + "\n"
-                + "UShuffle - Minghui Jiang, James Anderson, Joel Gillespie, and Martin Mayne. uShuffle: a useful tool for shuffling biological sequences while preserving the k-let counts. BMC Bioinformatics, 9:#192, 2008. https://github.com/guma44/ushuffle\n"
-                + "\n"
-                + "BioJava (Core 4.2.0) - Andreas Prlic; Andrew Yates; Spencer E. Bliven; Peter W. Rose; Julius Jacobsen; Peter V. Troshin; Mark Chapman; Jianjiong Gao; Chuan Hock Koh; Sylvain Foisy; Richard Holland; Gediminas Rimsa; Michael L. Heuer; H. Brandstatter-Muller; Philip E. Bourne; Scooter Willis. BioJava: an open-source framework for bioinformatics in 2012. Bioinformatics (2012) 28 (20): 2693-2695. https://github.com/biojava/biojava\n"
-                + "\n"
-                + "OpenCSV 4.1 - A Simple CSV Parser for Java under a commercial-friendly Apache 2.0 license\n"
-                + "https://sourceforge.net/projects/opencsv/\n"
-                + "\n"
-                + "License\n"
-                + "Copyright (C) 2018 David A. Mancilla\n"
-                + "GNU General Public License http://www.gnu.org/licenses/.";
+          + "Introduction\n"
+          + "Multi-threaded application that searches for hairpin structures in cDNA / mRNA sequences (FASTA or GenBank) with specific consensus sequences in the loop. It implements RNAfold to predict the structure of the sequence, and UShuffle to generate random sequences with conservation of the k-nucleotide frequency.\n"
+          + "\n\n"
+          + "Requirements\n"
+          + "JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences.\n"
+          + "\n"
+          + "Instructions\n"
+          + "Credits and Acknowledgments\n"
+          + "RNAfold 2.4.9 - Ivo L Hofacker, Walter Fontana, Sebastian Bonhoeffer, Peter F Stadler, Ronny Lorenz. https://www.tbi.univie.ac.at/RNA/RNAfold.1.html\n"
+          + "\n"
+          + "UShuffle - Minghui Jiang, James Anderson, Joel Gillespie, and Martin Mayne. uShuffle: a useful tool for shuffling biological sequences while preserving the k-let counts. BMC Bioinformatics, 9:#192, 2008. https://github.com/guma44/ushuffle\n"
+          + "\n"
+          + "BioJava (Core 4.2.0) - Andreas Prlic; Andrew Yates; Spencer E. Bliven; Peter W. Rose; Julius Jacobsen; Peter V. Troshin; Mark Chapman; Jianjiong Gao; Chuan Hock Koh; Sylvain Foisy; Richard Holland; Gediminas Rimsa; Michael L. Heuer; H. Brandstatter-Muller; Philip E. Bourne; Scooter Willis. BioJava: an open-source framework for bioinformatics in 2012. Bioinformatics (2012) 28 (20): 2693-2695. https://github.com/biojava/biojava\n"
+          + "\n"
+          + "OpenCSV 4.1 - A Simple CSV Parser for Java under a commercial-friendly Apache 2.0 license\n"
+          + "https://sourceforge.net/projects/opencsv/\n"
+          + "\n"
+          + "License\n"
+          + "Copyright (C) 2018 David A. Mancilla\n"
+          + "GNU General Public License http://www.gnu.org/licenses/.";
 
         initComponents();
     }
@@ -196,10 +196,8 @@ public class AboutFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new AboutFrame().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new AboutFrame().setVisible(true);
         });
     }
 

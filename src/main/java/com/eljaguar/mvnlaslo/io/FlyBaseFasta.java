@@ -22,7 +22,7 @@ package com.eljaguar.mvnlaslo.io;
  * @author David
  *
  */
-public class FlyBaseFastaID extends SourceFile {
+public class FlyBaseFasta extends SourceFile {
 
     private static String TYPE = "type=";
     private static String LOCATION = "loc="; 
@@ -34,14 +34,14 @@ public class FlyBaseFastaID extends SourceFile {
     private static String RELEASE = "release="; 
     private static String SPECIES = "species="; 
     private static String HEADER = 
-            "GeneID" + getROW_DELIMITER() 
-            + "TranscriptID" + getROW_DELIMITER() 
-            + "Name" + getROW_DELIMITER() 
-            + "Release" + getROW_DELIMITER() 
-            + "DBXREF" + getROW_DELIMITER() 
-            + "Score" + getROW_DELIMITER()
-            + "Checksum" + getROW_DELIMITER() 
-            + "Species" + getROW_DELIMITER();
+            "GeneID" + ROW_DELIMITER 
+            + "TranscriptID" + ROW_DELIMITER 
+            + "Name" + ROW_DELIMITER 
+            + "Release" + ROW_DELIMITER 
+            + "DBXREF" + ROW_DELIMITER 
+            + "Score" + ROW_DELIMITER
+            + "Checksum" + ROW_DELIMITER 
+            + "Species" + ROW_DELIMITER;
 
     /**
      * @return the CHECKSUM
@@ -194,7 +194,7 @@ public class FlyBaseFastaID extends SourceFile {
     /**
      *
      */
-    public FlyBaseFastaID() {
+    public FlyBaseFasta() {
         this.transcriptID = "";
         this.geneID = "";
         this.location = "";     //$NON-NLS-1$
@@ -211,7 +211,7 @@ public class FlyBaseFastaID extends SourceFile {
      * @return
      */
     public static String getHeader() {
-        return FlyBaseFastaID.getHEADER();
+        return FlyBaseFasta.getHEADER();
     }
 
     @Override
@@ -258,128 +258,128 @@ public class FlyBaseFastaID extends SourceFile {
         }
 
         // get location
-        index = idSequence.indexOf(FlyBaseFastaID.getLOCATION(), 0);
+        index = idSequence.indexOf(FlyBaseFasta.getLOCATION(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getLOCATION().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getLOCATION().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getLOCATION().length());
+                aux = idsequence.substring(FlyBaseFasta.getLOCATION().length());
             }
 
             setLocation(aux.trim());
         }
 
         // get name
-        index = idsequence.indexOf(FlyBaseFastaID.getNAME(), 0);
+        index = idsequence.indexOf(FlyBaseFasta.getNAME(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getNAME().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getNAME().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getNAME().length());
+                aux = idsequence.substring(FlyBaseFasta.getNAME().length());
             }
 
             setName(aux.trim());
         }
 
         // get dbxref
-        index = idsequence.indexOf(FlyBaseFastaID.getDBXREF(), 0);
+        index = idsequence.indexOf(FlyBaseFasta.getDBXREF(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getDBXREF().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getDBXREF().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getDBXREF().length());
+                aux = idsequence.substring(FlyBaseFasta.getDBXREF().length());
             }
 
             setDbxref(aux.trim());
         }
 
         // get score
-        index = idsequence.indexOf(FlyBaseFastaID.getSCORE(), 0);
+        index = idsequence.indexOf(FlyBaseFasta.getSCORE(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getSCORE().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getSCORE().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getSCORE().length());
+                aux = idsequence.substring(FlyBaseFasta.getSCORE().length());
             }
 
             setScore(aux.trim());
         }
 
         // get checksum
-        index = idsequence.indexOf(FlyBaseFastaID.getCHECKSUM(), 0);
+        index = idsequence.indexOf(FlyBaseFasta.getCHECKSUM(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getCHECKSUM().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getCHECKSUM().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getCHECKSUM().length());
+                aux = idsequence.substring(FlyBaseFasta.getCHECKSUM().length());
             }
 
             setChecksum(aux.trim());
         }
 
         // get GeneID
-        index = idsequence.indexOf(FlyBaseFastaID.getGENE_ID(), 0);
+        index = idsequence.indexOf(FlyBaseFasta.getGENE_ID(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getGENE_ID().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getGENE_ID().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getGENE_ID().length());
+                aux = idsequence.substring(FlyBaseFasta.getGENE_ID().length());
             }
 
             setGeneID(aux.trim());
         }
 
         // get release
-        index = idsequence.indexOf(FlyBaseFastaID.getRELEASE(), 0);
+        index = idsequence.indexOf(FlyBaseFasta.getRELEASE(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getRELEASE().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getRELEASE().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getRELEASE().length());
+                aux = idsequence.substring(FlyBaseFasta.getRELEASE().length());
             }
 
             setRelease(aux.trim());
         }
 
         // get specie
-        index = idsequence.indexOf(FlyBaseFastaID.getSPECIES(), 0);
+        index = idsequence.indexOf(FlyBaseFasta.getSPECIES(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(';');
 
             if (index2 > 0) {
-                aux = idsequence.substring(FlyBaseFastaID.getSPECIES().length(), index2);
+                aux = idsequence.substring(FlyBaseFasta.getSPECIES().length(), index2);
             } else {
-                aux = idsequence.substring(FlyBaseFastaID.getSPECIES().length());
+                aux = idsequence.substring(FlyBaseFasta.getSPECIES().length());
             }
 
             setSpecies(aux.trim());
@@ -388,14 +388,14 @@ public class FlyBaseFastaID extends SourceFile {
 
     @Override
     public String toRowCSV() {
-        return getGeneID() + getROW_DELIMITER()
-                + getTranscriptID() + getROW_DELIMITER()
-                + getName() + getROW_DELIMITER()
-                + getRelease() + getROW_DELIMITER()
-                + getDbxref() + getROW_DELIMITER()
-                + getScore() + getROW_DELIMITER()
-                + getChecksum() + getROW_DELIMITER()
-                + getSpecies() + getROW_DELIMITER();
+        return getGeneID() + ROW_DELIMITER
+                + getTranscriptID() + ROW_DELIMITER
+                + getName() + ROW_DELIMITER
+                + getRelease() + ROW_DELIMITER
+                + getDbxref() + ROW_DELIMITER
+                + getScore() + ROW_DELIMITER
+                + getChecksum() + ROW_DELIMITER
+                + getSpecies() + ROW_DELIMITER;
     }
 
     /**

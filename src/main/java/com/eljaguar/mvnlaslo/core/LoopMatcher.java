@@ -17,13 +17,14 @@
  */
 package com.eljaguar.mvnlaslo.core;
 
-import com.opencsv.CSVWriter;
-import com.eljaguar.mvnlaslo.tools.RNAFoldConfiguration;
-import com.eljaguar.mvnlaslo.tools.UShuffle;
 import com.eljaguar.mvnlaslo.io.FASTACorrector;
 import com.eljaguar.mvnlaslo.io.InputSequence;
 import com.eljaguar.mvnlaslo.io.SourceFile;
 import static com.eljaguar.mvnlaslo.io.SourceFile.*;
+import com.eljaguar.mvnlaslo.io.Vienna;
+import com.eljaguar.mvnlaslo.tools.RNAFoldConfiguration;
+import com.eljaguar.mvnlaslo.tools.UShuffle;
+import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -40,15 +41,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.swing.JProgressBar;
 import org.biojava.nbio.core.sequence.DNASequence;
-import java.util.ResourceBundle;
 import static org.biojava.nbio.core.sequence.io.FastaReaderHelper.readFastaDNASequence;
 import static org.biojava.nbio.core.sequence.io.GenbankReaderHelper.readGenbankDNASequence;
-import javax.swing.JProgressBar;
 
 /**
  * @author David
@@ -94,10 +95,10 @@ public class LoopMatcher {
      * @param searchReverse
      */
     public LoopMatcher(String pathOut, String pathIn,
-            ArrayList<String> loopPatterns, String additionalSequence,
-            InputSequence inputType, int minLength, int maxLength,
-            int maxWooble, int maxMismatch, Locale locale, int kLetRandoms,
-            boolean searchReverse) {
+      ArrayList<String> loopPatterns, String additionalSequence,
+      InputSequence inputType, int minLength, int maxLength,
+      int maxWooble, int maxMismatch, Locale locale, int kLetRandoms,
+      boolean searchReverse) {
         this.pathOut = pathOut;
         this.loopPatterns = loopPatterns;
         this.inputType = inputType;
@@ -123,8 +124,8 @@ public class LoopMatcher {
      */
     public LoopMatcher() {
         this("", "", new ArrayList<>(), BiologicPatterns.PUM1,
-                InputSequence.ENSEMBL, //NOI18N
-                4, 16, 2, 0, new Locale("es", "ES"), 2, false);
+          InputSequence.ENSEMBL, //NOI18N
+          4, 16, 2, 0, new Locale("es", "ES"), 2, false);
         SequenceAnalizer.setBundle(bundle);
     }
 
@@ -408,7 +409,7 @@ public class LoopMatcher {
      * @param headerList
      */
     public void writeCSV(String sFileName, List<StemLoop> stemResearch,
-            String headerList) {
+      String headerList) {
 
         CSVWriter writer;
 
@@ -418,9 +419,9 @@ public class LoopMatcher {
 
         try {
             writer = new CSVWriter(new FileWriter(sFileName), ';',
-                    CSVWriter.DEFAULT_QUOTE_CHARACTER,
-                    CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                    CSVWriter.DEFAULT_LINE_END);
+              CSVWriter.DEFAULT_QUOTE_CHARACTER,
+              CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+              CSVWriter.DEFAULT_LINE_END);
 
             if (headerList != null) {
                 String[] header;
@@ -439,8 +440,8 @@ public class LoopMatcher {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             out.println(java.text.MessageFormat.format(
-                    getBundle()
-                            .getString("ERROR_EX"), new Object[]{e.getMessage()}));
+              getBundle()
+                .getString("ERROR_EX"), new Object[]{e.getMessage()}));
             out.println("*Method: writeCSV*");
         }
     }
@@ -469,7 +470,7 @@ public class LoopMatcher {
         boolean isGenBank = false;
         ini = Calendar.getInstance();
         out.println(java.text.MessageFormat.format(getBundle().getString("START_TIME"),
-                new Object[]{Calendar.getInstance().getTime()}));
+          new Object[]{Calendar.getInstance().getTime()}));
         out.flush();
 
         if (getFileList() == null) {
@@ -479,16 +480,16 @@ public class LoopMatcher {
         if (this.isMakeRandoms()) {
             out.print(getBundle().getString("MAKING_RANDOM_SEQUENCES"));
             for (File currentFile : getFileList()) {
-                if (currentFile.isFile()
-                        && (currentFile.toString().endsWith(getFASTA_EXT())
-                        || currentFile.toString().endsWith(getFASTA_EXT_2())
-                        || currentFile.toString().endsWith(getGENBANK_EXT()))) {
+                if ((currentFile.toString().endsWith(GENBANK_EXT)
+                  || currentFile.toString().endsWith(FASTA_EXT)
+                  || currentFile.toString().endsWith(FASTA_EXT_2))
+                  && currentFile.isFile()) {
 
                     //fileName = currentFile.getName();
                     LinkedHashMap<String, DNASequence> dnaFile = null;
 
                     try {
-                        if (currentFile.toString().endsWith(getGENBANK_EXT())) {
+                        if (currentFile.toString().endsWith(GENBANK_EXT)) {
                             dnaFile = readGenbankDNASequence(currentFile, false);
                             isGenBank = true;
                         } else {
@@ -497,17 +498,17 @@ public class LoopMatcher {
 
                     } catch (IOException ex) {
                         out.println(java.text.MessageFormat.format(
-                                getBundle()
-                                        .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                          getBundle()
+                            .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
                         out.println("*Method: startReadingFiles*");
                     } catch (Exception ex) {
                         out.println(java.text.MessageFormat.format(
-                                getBundle()
-                                        .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+                          getBundle()
+                            .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
                         out.println("*Method: startReadingFiles*");
                     }
                     UShuffle.makeShuffleSequences(getPathOut(), currentFile.getName(),
-                            dnaFile, getNumberOfRandoms(), getkLetRandoms(), isGenBank);
+                      dnaFile, getNumberOfRandoms(), getkLetRandoms(), isGenBank);
                 }
             }
             out.print(getBundle().getString("DONE"));
@@ -529,9 +530,10 @@ public class LoopMatcher {
         // I. File level (hacer un hilo)
         for (File currentFile : getFileList()) {
             if (currentFile.isFile()
-                    && (currentFile.toString().endsWith(getGENBANK_EXT())
-                    || currentFile.toString().endsWith(getFASTA_EXT())
-                    || currentFile.toString().endsWith(getFASTA_EXT_2()))) {
+              && (currentFile.toString().endsWith(GENBANK_EXT)
+              || currentFile.toString().endsWith(FASTA_EXT)
+              || currentFile.toString().endsWith(FASTA_EXT_2)
+              || currentFile.toString().endsWith(VIENNA_EXT))) {
 
                 this.setActualFile(currentFile);
                 callProcessThreads();
@@ -540,9 +542,9 @@ public class LoopMatcher {
 
         fin = Calendar.getInstance();
         out.print(java.text.MessageFormat.format(getBundle()
-                .getString("TOTAL_TIME"),
-                new Object[]{((fin.getTimeInMillis()
-                    - ini.getTimeInMillis()) / 1000)}));
+          .getString("TOTAL_TIME"),
+          new Object[]{((fin.getTimeInMillis()
+              - ini.getTimeInMillis()) / 1000)}));
 
         out.flush();
 
@@ -558,7 +560,11 @@ public class LoopMatcher {
     public void callProcessThreads() {
 
         CSVWriter writer;
-        boolean genbank;
+        Vienna vienna = null;
+        boolean isGenBank = false;
+        boolean isVienna = false;
+        boolean isFasta = false;
+        boolean formatFile;
         String fileName, fileOut;
         final int MAX_HILOS = 15;
         int totalSecuencias;
@@ -566,6 +572,7 @@ public class LoopMatcher {
         int i;
         int count;
 
+        Iterator<String> patternItr = getLoopPatterns().iterator();
         ExecutorService pool;
         CountDownLatch latch;
         Calendar ini, fin;
@@ -578,12 +585,12 @@ public class LoopMatcher {
         try {
             fileName = getActualFile().getName();
             out.print(java.text.MessageFormat.format(getBundle()
-                    .getString("FILE_PRINT"), new Object[]{fileName}));
+              .getString("FILE_PRINT"), new Object[]{fileName}));
             out.flush();
             fileName = fileName.replaceFirst("[.][^.]+$", "");
             fileOut = this.getPathOut() + "\\" + fileName + "."
-                    + mode + "." + this.minLength + "." + this.maxLength
-                    + getCSV_EXT();
+              + mode + "." + this.minLength + "." + this.maxLength
+              + CSV_EXT;
 
             if (new File(fileOut).exists()) {
                 try {
@@ -598,20 +605,27 @@ public class LoopMatcher {
 
             // Generation of the iterator of {id,sequence}
             LinkedHashMap<String, DNASequence> fasta;
+            fasta = new LinkedHashMap<>();
 
-            if (getActualFile().getName().endsWith(getGENBANK_EXT())) {
+            isGenBank = getActualFile().getName().endsWith(GENBANK_EXT);
+            isVienna = getActualFile().getName().endsWith(VIENNA_EXT);
+            isFasta = getActualFile().getName().endsWith(FASTA_EXT)
+              || getActualFile().getName().endsWith(FASTA_EXT_2);
+
+            if (isGenBank) {
                 fasta = readGenbankDNASequence(getActualFile());
-                genbank = true;
-            } else {
+            }
+            if (isVienna) {
+                vienna = new Vienna(getActualFile());
+            }
+            if (isFasta) {
                 fasta = readFastaDNASequence(getActualFile(), false);
-                genbank = false;
             }
 
-            if (fasta.isEmpty()) {
+            if (fasta.isEmpty() && !isVienna) {
                 out.println(getBundle().getString("INVALID_FILE_FORMAT"));
                 out.println(getBundle().getString("TRYING_TO_FIX"));
-                boolean formatFile = FASTACorrector
-                        .formatFile(getActualFile().getAbsolutePath());
+                formatFile = FASTACorrector.formatFile(getActualFile().getAbsolutePath());
                 if (formatFile) {
                     fasta = readFastaDNASequence(getActualFile(), false);
                 } else {
@@ -620,22 +634,27 @@ public class LoopMatcher {
                 }
             }
 
-            if (!genbank) {
+            if (isFasta) {
                 this.setInputType(SourceFile.detectHeader(
-                        fasta.entrySet().iterator().next().getValue()
-                                .getOriginalHeader()));
-            } else {
+                  fasta.entrySet().iterator().next().getValue()
+                    .getOriginalHeader()));
+            }
+            if (isGenBank) {
                 this.setInputType(InputSequence.GENBANK);
             }
 
-            totalSecuencias = fasta.entrySet().size();
+            if (isVienna) {
+                this.setInputType(InputSequence.VIENNA);
+            }
+
+            totalSecuencias = isVienna ? 1 : fasta.entrySet().size();
 
             writer = new CSVWriter(new FileWriter(fileOut), ';',
-                    CSVWriter.DEFAULT_QUOTE_CHARACTER,
-                    CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                    CSVWriter.DEFAULT_LINE_END);
+              CSVWriter.DEFAULT_QUOTE_CHARACTER,
+              CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+              CSVWriter.DEFAULT_LINE_END);
             writer.writeNext(StemLoop.getHeader(this.getInputType())
-                    .split(";"));
+              .split(";"));
 
             // II. Transcript level
             if (totalSecuencias < nHilos) {
@@ -650,16 +669,15 @@ public class LoopMatcher {
             this.progress = 0;
             count = 1;
 
+            // a. FASTA and GenBank way
             for (Map.Entry<String, DNASequence> entry : fasta.entrySet()) {
 
                 DNASequence element = entry.getValue();
-                Iterator<String> patternItr = getLoopPatterns().iterator();
-
                 LoopMatcherThread thread = new LoopMatcherThread(
-                        isExtendedMode(), getAdditionalSequence(),
-                        getMaxLength(), getMinLength(), element,
-                        getInputType(), patternItr, writer, isSearchReverse(),
-                        bundle, temperature, avoidLonelyPairs);
+                  isExtendedMode(), getAdditionalSequence(),
+                  getMaxLength(), getMinLength(), element,
+                  getInputType(), patternItr, writer, isSearchReverse(),
+                  bundle, temperature, avoidLonelyPairs);
 
                 this.progress = (int) round(count / (double) totalSecuencias * 100);
                 jpBar.setValue(progress);
@@ -687,14 +705,21 @@ public class LoopMatcher {
                         pool.execute(thread);
                     }
                 }
-
-                // Print
-                /*if(this.progress % 15 == 0 || this.progress % 6 == 0){
-                    out.printf(getBundle()
-                            .getString("PROGRESO"), 
-                            this.progress);
-                }*/
                 count++;
+            }
+
+            // b. Vienna way
+            if (isVienna) {
+
+                LoopMatcherThread thread = new LoopMatcherThread(vienna,
+                  getMaxLength(), getMinLength(), getAdditionalSequence(),
+                  patternItr, writer, bundle);
+
+                this.progress = (int) round(count / (double) totalSecuencias * 100);
+                jpBar.setValue(progress);
+
+                thread.setLatch(latch);
+                pool.execute(thread);
             }
 
             if (latch.getCount() > 0) {
@@ -710,19 +735,19 @@ public class LoopMatcher {
             fin = Calendar.getInstance();
 
             out.printf(getBundle().getString("SUMMARY"),
-                    totalSecuencias,
-                    (fin.getTimeInMillis() - ini.getTimeInMillis()) / (double) 1000);
+              totalSecuencias,
+              (fin.getTimeInMillis() - ini.getTimeInMillis()) / (double) 1000);
 
         } catch (FileNotFoundException ex) {
             out.println(getBundle().getString("CANT_OPEN_FILE"));
             out.println(java.text.MessageFormat.format(
-                    getBundle()
-                            .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+              getBundle()
+                .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
             out.println("*Method: callProcessThreads*");
         } catch (Exception ex) {
             out.println(java.text.MessageFormat.format(
-                    getBundle()
-                            .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
+              getBundle()
+                .getString("ERROR_EX"), new Object[]{ex.getMessage()}));
             out.println("*Method: callProcessThreads*");
         }
     }

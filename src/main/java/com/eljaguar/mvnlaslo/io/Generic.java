@@ -22,14 +22,14 @@ package com.eljaguar.mvnlaslo.io;
  * @author David
  *
  */
-public class GenericID extends SourceFile {
+public class Generic extends SourceFile {
 
-    final static String HEADER = "SequenceID" + getROW_DELIMITER();
+    final static String HEADER = "SequenceID" + ROW_DELIMITER;
 
     /**
      *
      */
-    public GenericID() {
+    public Generic() {
         this.geneID = "";
     }
 
@@ -47,7 +47,7 @@ public class GenericID extends SourceFile {
      * @return
      */
     public static String getHeader() {
-        return GenericID.HEADER;
+        return Generic.HEADER;
     }
 
     /**
@@ -65,6 +65,6 @@ public class GenericID extends SourceFile {
      */
     @Override
     public String toRowCSV() {
-        return getGeneID() + getROW_DELIMITER();
+        return getGeneID() + ROW_DELIMITER;
     }
 }

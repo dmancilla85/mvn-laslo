@@ -17,16 +17,15 @@
  */
 package com.eljaguar.mvnlaslo.gui;
 
-import java.awt.Color;
-import javax.swing.UIManager;
 import com.eljaguar.mvnlaslo.core.LoopMatcher;
-import com.eljaguar.mvnlaslo.tools.RNAFoldConfiguration;
-import com.eljaguar.mvnlaslo.io.GenBankID;
+import com.eljaguar.mvnlaslo.io.GenBank;
 import com.eljaguar.mvnlaslo.io.InputSequence;
 import static com.eljaguar.mvnlaslo.io.InputSequence.BIOMART;
 import static com.eljaguar.mvnlaslo.io.InputSequence.ENSEMBL;
 import static com.eljaguar.mvnlaslo.io.InputSequence.FLYBASE;
 import static com.eljaguar.mvnlaslo.io.InputSequence.GENERIC;
+import com.eljaguar.mvnlaslo.tools.RNAFoldConfiguration;
+import java.awt.Color;
 import static java.awt.EventQueue.invokeLater;
 import java.awt.event.WindowEvent;
 import static java.awt.event.WindowEvent.WINDOW_CLOSING;
@@ -59,7 +58,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -1295,7 +1293,7 @@ public class GUIFrame extends javax.swing.JFrame {
      */
     private static boolean netIsAvailable() {
         try {
-            String proxyConn = GenBankID.getProxyConfiguration();
+            String proxyConn = GenBank.getProxyConfiguration();
 
             if (proxyConn.length() > 0) {
                 String proxyParm[] = proxyConn.split(",");

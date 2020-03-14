@@ -21,7 +21,7 @@ package com.eljaguar.mvnlaslo.io;
  * @author David
  *
  */
-public class EnsemblFastaID extends SourceFile {
+public class EnsemblFasta extends SourceFile {
 
     private String GENE = "gene:";
     private static String GENE_BIOTYPE = "gene_biotype:";
@@ -29,13 +29,13 @@ public class EnsemblFastaID extends SourceFile {
     private static String GENE_SYMBOL = "gene_symbol:";
     private static String DESCRIPTION = "description:";
 
-    private static String HEADER = "GeneID" + getROW_DELIMITER()
-            + "GeneSymbol" + getROW_DELIMITER()
-            + "GeneBioType" + getROW_DELIMITER()
-            + "TranscriptID" + getROW_DELIMITER()
-            + "TranscriptBiotype" + getROW_DELIMITER()
-            + "#Splice" + getROW_DELIMITER()
-            + "Description" + getROW_DELIMITER();
+    private static String HEADER = "GeneID" + ROW_DELIMITER
+            + "GeneSymbol" + ROW_DELIMITER
+            + "GeneBioType" + ROW_DELIMITER
+            + "TranscriptID" + ROW_DELIMITER
+            + "TranscriptBiotype" + ROW_DELIMITER
+            + "#Splice" + ROW_DELIMITER
+            + "Description" + ROW_DELIMITER;
 
     private String geneBiotype;
     private String transcriptBiotype;
@@ -45,7 +45,7 @@ public class EnsemblFastaID extends SourceFile {
     /**
      *
      */
-    public EnsemblFastaID() {
+    public EnsemblFasta() {
         this.transcriptID = ""; //$NON-NLS-1$
         this.geneID = ""; //$NON-NLS-1$
         this.geneBiotype = ""; //$NON-NLS-1$
@@ -62,13 +62,13 @@ public class EnsemblFastaID extends SourceFile {
      */
     @Override
     public String toRowCSV() {
-        return getGeneID() + getROW_DELIMITER()
-                + getGeneSymbol() + getROW_DELIMITER()
-                + getGeneBiotype() + getROW_DELIMITER()
-                + getTranscriptID() + getROW_DELIMITER()
-                + getTranscriptBiotype() + getROW_DELIMITER()
-                + getSpliceNumber() + getROW_DELIMITER()
-                + getDescription() + getROW_DELIMITER();
+        return getGeneID() + ROW_DELIMITER
+                + getGeneSymbol() + ROW_DELIMITER
+                + getGeneBiotype() + ROW_DELIMITER
+                + getTranscriptID() + ROW_DELIMITER
+                + getTranscriptBiotype() + ROW_DELIMITER
+                + getSpliceNumber() + ROW_DELIMITER
+                + getDescription() + ROW_DELIMITER;
     }
 
     /**
@@ -149,48 +149,48 @@ public class EnsemblFastaID extends SourceFile {
             setGeneBiotype(aux.trim());
         }
         // get Trancript Biotype
-        index = idsequence.indexOf(EnsemblFastaID.getTRANSCRIPT_BIOTYPE(), 0);
+        index = idsequence.indexOf(EnsemblFasta.getTRANSCRIPT_BIOTYPE(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(' ');
 
             if (index2 > 0) {
-                aux = idsequence.substring(EnsemblFastaID.getTRANSCRIPT_BIOTYPE().length(), index2);
+                aux = idsequence.substring(EnsemblFasta.getTRANSCRIPT_BIOTYPE().length(), index2);
             } else {
-                aux = idsequence.substring(EnsemblFastaID.getTRANSCRIPT_BIOTYPE().length());
+                aux = idsequence.substring(EnsemblFasta.getTRANSCRIPT_BIOTYPE().length());
             }
 
             setTranscriptBiotype(aux.trim());
         }
 
         // get Gene Symbol
-        index = idsequence.indexOf(EnsemblFastaID.getGENE_SYMBOL(), 0);
+        index = idsequence.indexOf(EnsemblFasta.getGENE_SYMBOL(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.indexOf(' ');
 
             if (index2 > 0) {
-                aux = idsequence.substring(EnsemblFastaID.getGENE_SYMBOL().length(), index2);
+                aux = idsequence.substring(EnsemblFasta.getGENE_SYMBOL().length(), index2);
             } else {
-                aux = idsequence.substring(EnsemblFastaID.getGENE_SYMBOL().length());
+                aux = idsequence.substring(EnsemblFasta.getGENE_SYMBOL().length());
             }
 
             setGeneSymbol(aux.trim());
         }
 
         // Description
-        index = idsequence.indexOf(EnsemblFastaID.getDESCRIPTION(), 0);
+        index = idsequence.indexOf(EnsemblFasta.getDESCRIPTION(), 0);
 
         if (index > 0) {
             idsequence = idsequence.substring(index);
             index2 = idsequence.lastIndexOf(':');
 
             if (index2 > 0) {
-                aux = idsequence.substring(EnsemblFastaID.getDESCRIPTION().length(), idsequence.lastIndexOf(' '));
+                aux = idsequence.substring(EnsemblFasta.getDESCRIPTION().length(), idsequence.lastIndexOf(' '));
             } else {
-                aux = idsequence.substring(EnsemblFastaID.getDESCRIPTION().length());
+                aux = idsequence.substring(EnsemblFasta.getDESCRIPTION().length());
             }
 
             setDescription(aux.trim());
@@ -203,7 +203,7 @@ public class EnsemblFastaID extends SourceFile {
      * @return
      */
     public static String getHeader() {
-        return EnsemblFastaID.getHEADER();
+        return EnsemblFasta.getHEADER();
     }
 
     /**
