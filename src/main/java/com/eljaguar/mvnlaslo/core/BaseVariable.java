@@ -17,67 +17,85 @@
 package com.eljaguar.mvnlaslo.core;
 
 /**
- * 
+ *
  * @author David A. Mancilla
  */
 public class BaseVariable {
-   private Character base;
-   private Integer position;
-   private Character value;
 
-  /**
-   * 
-   * @param base
-   * @param position
-   * @param value 
-   */
-   BaseVariable(Character base, Integer position){
-       this.base = base;
-       this.position = position;
-       this.value = null;
-   }
-   
+    /**
+     * variable.
+     */
+    private Character base;
+    /**
+     * variable.
+     */
+    private Integer position;
+
+    /**
+     * variable.
+     */
+    private Character value;
+
+    /**
+     *
+     * @param pbase
+     * @param position
+     * @param value
+     */
+    BaseVariable(final Character pbase, Integer position) {
+        this.base = pbase;
+        this.position = position;
+        this.value = null;
+    }
+
     /**
      * @return the base
      */
-    public Character getBase() {
+    public final Character getBase() {
         return base;
     }
 
     /**
      * @return the position
      */
-    public Integer getPosition() {
+    public final Integer getPosition() {
         return position;
     }
 
     /**
      * @param base the base to set
      */
-    public void setBase(Character base) {
+    public final void setBase(final Character base) {
         this.base = base;
     }
 
     /**
      * @param position the position to set
      */
-    public void setPosition(Integer position) {
+    public final void setPosition(final Integer position) {
         this.position = position;
     }
-    
-    public void setValue(Character value){
-        if(value == 'A' || value == 'C' || value == 'T' 
-            || value == 'U' || value == 'G'){
-            this.value = value;
+
+    /**
+     *
+     * @param pvalue sdf
+     */
+    public final void setValue(final Character pvalue) {
+        if (pvalue == 'A' || pvalue == 'C' || pvalue == 'T'
+          || pvalue == 'U' || pvalue == 'G') {
+            this.value = pvalue;
         }
     }
-    
-    public Character getValue(){
+
+    /**
+     * @return valor
+     */
+    public final Character getValue() {
         return this.value;
     }
-    
-   @Override
-    public String toString(){
+
+    @Override
+    public final String toString() {
         return "[" + base + "; " + position + ";" + value + "]";
     }
 }
