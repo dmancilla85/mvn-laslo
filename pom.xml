@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.eljaguar</groupId>
-    <artifactId>mvnlaslo</artifactId>
-    <version>1.2.2</version>
+    <artifactId>loopmatcher</artifactId>
+    <version>1.3.1</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,7 +30,7 @@
             <version>1.3.2</version>
         </dependency>
     </dependencies>
-    <name>Find-A-Loop</name>
+    <name>LoopMatcher 1.3.1</name>
     
     <build>
       <plugins>
@@ -52,7 +52,7 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <version>2.3.2</version>
             <configuration>
-               <debug>false</debug>
+               <debug>true</debug>
                <showDeprecation>true</showDeprecation>
             </configuration>
          </plugin>

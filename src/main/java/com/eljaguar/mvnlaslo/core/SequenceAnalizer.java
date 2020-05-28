@@ -419,16 +419,16 @@ public class SequenceAnalizer {
   public static void saveFuckingLoops(final String sequence, final int position,
     final int loopPos, final int loopSize) {
     FileWriter fw;
-    int loopRelative =(loopPos-position)+1; 
-    
+    int loopRelative = (loopPos - position) + 1;
+
     if (isComplementaryRNAWooble(sequence.charAt(loopRelative - 1),
       sequence.charAt(loopRelative + loopSize))
       && isComplementaryRNAWooble(sequence.charAt(loopRelative - 2),
-        sequence.charAt(loopRelative+ loopSize + 1))
+        sequence.charAt(loopRelative + loopSize + 1))
       && isComplementaryRNAWooble(sequence.charAt(loopRelative - 3),
         sequence.charAt(loopRelative + loopSize + 2))) {
       try {
-        fw = new FileWriter("motivos.fa", true);
+        fw = new FileWriter("secuencias.fa", true);
         fw.write(">" + position + '\n');
         fw.write(sequence + '\n');
         fw.close();
@@ -472,18 +472,10 @@ public class SequenceAnalizer {
     int sequenceLength;
     int loopLength = stemLoopPattern.length();
     boolean isValidHairpin;
-    String gene = "";
-    String note = "";
-    String synonym = "";
-    String id = "";
-    String cds = "";
-    String rnaSequence;
-    String stemLoop;
-    String rnaLoop;
-    String rnaSeq;
-    String hairpinModel;
-    hairpinModel = "";
-    rnaSequence = fastaSeq.getSequenceAsString().toUpperCase().replace('T', 'U');
+    String gene = "", note = "", synonym = "", id = "", cds = "";
+    String rnaSequence, stemLoop, rnaLoop, rnaSeq, hairpinModel = "";
+    rnaSequence = fastaSeq.getSequenceAsString().toUpperCase()
+      .replace('T', 'U');
     sequenceLength = rnaSequence.length();
 
     if (invert) {
@@ -509,50 +501,7 @@ public class SequenceAnalizer {
       int length = maxLength;
       slr = new StemLoop(inputType);
 
-      if (inputType != InputSequence.GENBANK) {
-        slr.setTags(fastaSeq.getOriginalHeader());
-      } else {
-
-        if (!fastaSeq.getOriginalHeader().contains("@")) {
-          Map qual = ((FeatureInterface) fastaSeq.getFeaturesByType("gene")
-            .toArray()[0]).getQualifiers();
-
-          if (!qual.isEmpty()) {
-
-            try {
-              gene = ((Qualifier) ((List) (qual.get("gene")))
-                .get(0)).getValue();
-            } catch (Exception e) {
-              gene = "null";
-            }
-
-            try {
-              synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
-                .getValue();
-            } catch (Exception e) {
-              synonym = "null";
-            }
-
-            try {
-              note = ((Qualifier) ((List) (qual.get("note"))).get(0))
-                .getValue();
-            } catch (Exception e) {
-              note = "null";
-            }
-            id = fastaSeq.getAccession().getID();
-            cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
-              .toArray()[0]).getSource();
-          }
-        } else { // ..must be reviewed..
-          String auxH[] = fastaSeq.getOriginalHeader().split("@");
-          gene = auxH[0];
-          synonym = auxH[1];
-          note = auxH[2];
-          id = auxH[3];
-          cds = auxH[4];
-        }
-        slr.setTags(gene, synonym, note, id, cds);
-      }
+      checkInputType(inputType, slr, fastaSeq, gene, synonym, note, id, cds);
 
       try {  // 1. extract the full stem-loop sequence
         // check left border length
@@ -571,7 +520,7 @@ public class SequenceAnalizer {
             loopPos + loopLength + length);
           // watch this shit ***********************
           //saveFuckingLoops(rnaSeq, loopPos - length + 1,
-          //  loopPos, rnaLoop.length());
+          //loopPos, rnaLoop.length());
           // ***************************************
           // 2.a first validation of 1st loop close pairs
           isValidHairpin = isRNAPair(rnaSequence.charAt(loopPos - 1),
@@ -591,7 +540,8 @@ public class SequenceAnalizer {
             try { // ..is it useful??..
               LoopMatcherThread.getSEM().acquire();
               // call RNAFoldInterface aplication
-              fold = new RNAFoldInterface(rnaSeq, temperature, avoidLonelyPairs);
+              fold = new RNAFoldInterface(rnaSeq, temperature,
+                avoidLonelyPairs);
 
             } catch (InterruptedException ex) {
               out.printf(getBundle().getString("ERROR_CLASE"),
@@ -669,10 +619,12 @@ public class SequenceAnalizer {
         slr.checkPairments();
         slr.checkInternalLoops();
         try {
-          slr.setMfe(new RNAFoldInterface(rnaSeq, temperature, avoidLonelyPairs).getMfe());
+          slr.setMfe(new RNAFoldInterface(rnaSeq, temperature,
+            avoidLonelyPairs).getMfe());
         } catch (Exception ex) {
           if (ex.getMessage().length() > 0) {
-            out.println(fastaSeq.getAccession() + " - RNAFold ERROR: " + ex.getMessage());
+            out.println(fastaSeq.getAccession() + " - RNAFold ERROR: "
+              + ex.getMessage());
           } else {
             out.println(fastaSeq.getAccession() + " - RNAFold unknown error.");
           }
@@ -731,6 +683,61 @@ public class SequenceAnalizer {
     slrList.clear();
 
     return size;
+  }
+
+  /**
+   * 
+   * @param pInputType
+   * @param pSlr
+   * @param pFastaSeq
+   * @param pGene
+   * @param pSynonym
+   * @param pNote
+   * @param pId
+   * @param pCds 
+   */
+  private static void checkInputType(InputSequence pInputType, StemLoop pSlr,
+    DNASequence pFastaSeq, String pGene, String pSynonym, String pNote,
+    String pId, String pCds) {
+    if (pInputType != InputSequence.GENBANK) {
+      pSlr.setTags(pFastaSeq.getOriginalHeader());
+    } else {
+      if (!pFastaSeq.getOriginalHeader().contains("@")) {
+        Map qual = ((FeatureInterface) pFastaSeq.getFeaturesByType("gene")
+          .toArray()[0]).getQualifiers();
+        if (!qual.isEmpty()) {
+          try {
+            pGene = ((Qualifier) ((List) (qual.get("gene")))
+              .get(0)).getValue();
+          } catch (Exception e) {
+            pGene = "null";
+          }
+          try {
+            pSynonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
+              .getValue();
+          } catch (Exception e) {
+            pSynonym = "null";
+          }
+          try {
+            pNote = ((Qualifier) ((List) (qual.get("note"))).get(0))
+              .getValue();
+          } catch (Exception e) {
+            pNote = "null";
+          }
+          pId = pFastaSeq.getAccession().getID();
+          pCds = ((FeatureInterface) pFastaSeq.getFeaturesByType("CDS").toArray()[0]).getSource();
+        }
+      } else {
+        // ..must be reviewed..
+        String[] auxH = pFastaSeq.getOriginalHeader().split("@");
+        pGene = auxH[0];
+        pSynonym = auxH[1];
+        pNote = auxH[2];
+        pId = auxH[3];
+        pCds = auxH[4];
+      }
+      pSlr.setTags(pGene, pSynonym, pNote, pId, pCds);
+    }
   }
 
   /**
@@ -803,51 +810,8 @@ public class SequenceAnalizer {
       int length = maxLength;
       slr = new StemLoop(inputType);
 
-      if (inputType != InputSequence.GENBANK) {
-        slr.setTags(fastaSeq.getOriginalHeader());
-      } else {
-
-        if (!fastaSeq.getOriginalHeader().contains("@")) {
-          Map qual = ((FeatureInterface) fastaSeq.getFeaturesByType("gene")
-            .toArray()[0]).getQualifiers();
-
-          if (!qual.isEmpty()) {
-
-            try {
-              gene = ((Qualifier) ((List) (qual.get("gene")))
-                .get(0)).getValue();
-            } catch (Exception e) {
-              gene = "null";
-            }
-
-            try {
-              synonym = ((Qualifier) ((List) (qual.get("gene_synonym"))).get(0))
-                .getValue();
-            } catch (Exception e) {
-              synonym = "null";
-            }
-
-            try {
-              note = ((Qualifier) ((List) (qual.get("note"))).get(0))
-                .getValue();
-            } catch (Exception e) {
-              note = "null";
-            }
-
-            id = fastaSeq.getAccession().getID();
-            cds = ((FeatureInterface) fastaSeq.getFeaturesByType("CDS")
-              .toArray()[0]).getSource();
-          }
-        } else { // ..must be reviewed..
-          String auxH[] = fastaSeq.getOriginalHeader().split("@");
-          gene = auxH[0];
-          synonym = auxH[1];
-          note = auxH[2];
-          id = auxH[3];
-          cds = auxH[4];
-        }
-        slr.setTags(gene, synonym, note, id, cds);
-      }
+      // ..must be reviewed..
+      checkInputType(inputType, slr, fastaSeq, gene, synonym, note, id, cds);
 
       try {  // 1. extract the full stem-loop sequence
 
