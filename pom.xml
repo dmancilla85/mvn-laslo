@@ -18,6 +18,7 @@
         </dependency>
         <!-- other biojava jars as needed -->
         <!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+        <!-- https://mvnrepository.com/artifact/org.netbeans.modules/org-netbeans-modules-web-inspect -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
