@@ -131,10 +131,6 @@ public class RNAFoldInterface {
       out.println("--Error executing RNAFold--");
       //Logger.getLogger(RNAFoldInterface.class.getName()).log(Level.SEVERE, null, ex);
       out.println("SeqLength: " + sequence.length());
-    } finally {
-      child = null;
-      outstr = null;
-      isr = null;
     }
   }
 

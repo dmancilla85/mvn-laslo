@@ -441,11 +441,13 @@ public class LoopMatcher {
         writer.writeNext(header);
       }
 
-      for (StemLoop stemResearch1 : stemResearch) {
-        String[] data;
-        data = stemResearch1.toRowCSV().split(";");
-        writer.writeNext(data);
-      }
+      stemResearch.stream().map((stemResearch1) -> {
+          String[] data;
+          data = stemResearch1.toRowCSV().split(";");
+            return data;
+        }).forEachOrdered((data) -> {
+            writer.writeNext(data);
+        });
 
       writer.close();
 
@@ -576,9 +578,9 @@ public class LoopMatcher {
 
     CSVWriter writer;
     Vienna vienna = null;
-    boolean isGenBank = false;
-    boolean isVienna = false;
-    boolean isFasta = false;
+    boolean isGenBank;
+    boolean isVienna;
+    boolean isFasta;
     boolean formatFile;
     String fileName, fileOut;
     final int MAX_HILOS = 15;
@@ -714,7 +716,6 @@ public class LoopMatcher {
           while (!pool.isTerminated());
 
           if (nHilos > 0) {
-            pool = null;
             pool = Executors.newFixedThreadPool(nHilos);
             latch = new CountDownLatch(nHilos);
             thread.setLatch(latch);
