@@ -17,7 +17,6 @@
  */
 package com.eljaguar.mvnlaslo.core;
 
-import static com.eljaguar.mvnlaslo.core.SequenceAnalizer.reverseIt;
 import com.eljaguar.mvnlaslo.io.BioMartFasta;
 import com.eljaguar.mvnlaslo.io.EnsemblFasta;
 import com.eljaguar.mvnlaslo.io.FlyBaseFasta;
@@ -34,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
+import static com.eljaguar.mvnlaslo.core.SequenceAnalizer.reverseSequence;
 
 /**
  * Main class for stem-loops
@@ -405,7 +405,7 @@ public class StemLoop {
     String theLoop = this.loop;
 
     if (isReversed()) {
-      theLoop = reverseIt(theLoop);
+      theLoop = reverseSequence(theLoop);
     }
 
     return theLoop;
@@ -422,8 +422,8 @@ public class StemLoop {
     terminal = this.getTerminalPair();
 
     if (isReversed()) {
-      theLoop = reverseIt(theLoop);
-      terminal = reverseIt(terminal);
+      theLoop = reverseSequence(theLoop);
+      terminal = reverseSequence(terminal);
     }
 
     return this.getPredecessorLoop() + theLoop
@@ -760,10 +760,10 @@ public class StemLoop {
     startPos = startPosLoop;
 
     if (isReversed()) {
-      this.setRnaHairpinSequence(reverseIt(this.getRnaHairpinSequence()));
+      this.setRnaHairpinSequence(reverseSequence(this.getRnaHairpinSequence()));
 
-      matchFirst = getRnaHairpinSequence().indexOf(reverseIt(getLoop()));
-      matchLast = getRnaHairpinSequence().lastIndexOf(reverseIt(getLoop()));
+      matchFirst = getRnaHairpinSequence().indexOf(reverseSequence(getLoop()));
+      matchLast = getRnaHairpinSequence().lastIndexOf(reverseSequence(getLoop()));
 
       if (matchFirst == matchLast) {
         startPos = matchFirst;
@@ -782,7 +782,7 @@ public class StemLoop {
       this.setPredecessor2Loop(precedes2);
 
       if (isReversed()) {
-        this.setRnaHairpinSequence(reverseIt(this.getRnaHairpinSequence()));
+        this.setRnaHairpinSequence(reverseSequence(this.getRnaHairpinSequence()));
       }
     } catch (Exception ex) {
       out.println("\nERROR: " + ex.getMessage());

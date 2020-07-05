@@ -251,11 +251,11 @@ public class FlyBaseFasta extends SourceFile {
             setTranscriptID(aux.trim());
         }
 
-        index2 = getTranscriptID().indexOf(';');
+        //index2 = getTranscriptID().indexOf(';');
 
-        if (index2 > 0) {
-            aux = getTranscriptID().substring(getTranscriptID().length(), index2);
-        }
+        //if (index2 > 0) {
+        //    aux = getTranscriptID().substring(getTranscriptID().length(), index2);
+        //}
 
         // get location
         index = idSequence.indexOf(FlyBaseFasta.getLOCATION(), 0);

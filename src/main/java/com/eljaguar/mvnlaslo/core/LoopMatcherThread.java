@@ -17,7 +17,6 @@
  */
 package com.eljaguar.mvnlaslo.core;
 
-import static com.eljaguar.mvnlaslo.core.SequenceAnalizer.sequenceExtendedResearch;
 import com.eljaguar.mvnlaslo.io.InputSequence;
 import com.eljaguar.mvnlaslo.io.Vienna;
 import com.eljaguar.mvnlaslo.tools.OSValidator;
@@ -30,6 +29,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import org.biojava.nbio.core.sequence.DNASequence;
+import static com.eljaguar.mvnlaslo.core.SequenceAnalizer.beginFullMatching;
 
 /**
  *
@@ -37,24 +37,24 @@ import org.biojava.nbio.core.sequence.DNASequence;
  */
 public class LoopMatcherThread implements Runnable {
 
-  private  final int LENGTH_CHECK_AUX = 15;
-  private  boolean extendedMode;
-  private  boolean searchReverse;
-  private  String additionalSequence;
-  private  int maxLength;
-  private  int minLength;
-  private  InputSequence inputType;
+  private final int LENGTH_CHECK_AUX = 15;
+  private final boolean extendedMode;
+  private final boolean searchReverse;
+  private final String additionalSequence;
+  private final int maxLength;
+  private final int minLength;
+  private final InputSequence inputType;
   private Iterator<String> patternItr;
-  private CSVWriter writer;
-  private  DNASequence dnaElement;
+  private final CSVWriter writer;
+  private final DNASequence dnaElement;
   private static Semaphore MUTEX = new Semaphore(1);
   private static Semaphore SEM;
   private static boolean started = false;
   private CountDownLatch latch;
-  private  ResourceBundle bundle;
-  private  int temperature;
-  private  boolean avoidLonelyPairs;
-  private  Vienna viennaElement;
+  private final ResourceBundle bundle;
+  private final int temperature;
+  private final boolean avoidLonelyPairs;
+  private final Vienna viennaElement;
 
   /**
    *
@@ -147,7 +147,7 @@ public class LoopMatcherThread implements Runnable {
   /**
    * @return the bundle
    */
-  public  ResourceBundle getBundle() {
+  public final ResourceBundle getBundle() {
     return bundle;
   }
 
@@ -156,13 +156,13 @@ public class LoopMatcherThread implements Runnable {
  * @param currentPattern
  */
   private void runNormalMode( String currentPattern) {
-    SequenceAnalizer.sequenceResearch(getDnaElement(), currentPattern,
+    SequenceAnalizer.beginDefaultMatching(getDnaElement(), currentPattern,
       getWriter(), false, getMaxLength(), getMinLength(),
       getInputType(), getAdditionalSequence(), temperature,
       avoidLonelyPairs);
 
     if (isSearchReverse()) {
-      SequenceAnalizer.sequenceResearch(getDnaElement(),
+      SequenceAnalizer.beginDefaultMatching(getDnaElement(),
         currentPattern, getWriter(), true, getMaxLength(),
         getMinLength(), getInputType(),
         getAdditionalSequence(), temperature,
@@ -175,7 +175,7 @@ public class LoopMatcherThread implements Runnable {
    * @param currentPattern
    */
   private void runViennaMode( String currentPattern) {
-    SequenceAnalizer.sequenceResearch(viennaElement, currentPattern, writer,
+    SequenceAnalizer.beginDefaultMatching(viennaElement, currentPattern, writer,
       false, maxLength, minLength, additionalSequence);
   }
 
@@ -188,7 +188,7 @@ public class LoopMatcherThread implements Runnable {
      String currentPattern) {
     try {
       getSEM().acquire();
-      sequenceExtendedResearch(getDnaElement(),
+      beginFullMatching(getDnaElement(),
         fold.getStructure(),
         currentPattern, getWriter(), false, getMaxLength(),
         getMinLength(), getInputType(),
@@ -215,7 +215,7 @@ public class LoopMatcherThread implements Runnable {
     if (isSearchReverse()) {
       try {
         getSEM().acquire();
-        sequenceExtendedResearch(getDnaElement(),
+        beginFullMatching(getDnaElement(),
           fold.getStructure(),
           currentPattern, getWriter(), true, getMaxLength(),
           getMinLength(), getInputType(),
@@ -305,7 +305,7 @@ public class LoopMatcherThread implements Runnable {
    *
    */
   @Override
-  public  void run() {
+  public final void run() {
 
     RNAFoldInterface fold = new RNAFoldInterface();
     String currentPattern="";
@@ -340,77 +340,77 @@ public class LoopMatcherThread implements Runnable {
   /**
    * @return the additionalSequence
    */
-  public  String getAdditionalSequence() {
+  public final String getAdditionalSequence() {
     return additionalSequence;
   }
 
   /**
    * @return the dnaElement
    */
-  public  DNASequence getDnaElement() {
+  public final DNASequence getDnaElement() {
     return dnaElement;
   }
 
   /**
    * @return the inputType
    */
-  public  InputSequence getInputType() {
+  public final InputSequence getInputType() {
     return inputType;
   }
 
   /**
    * @return the latch
    */
-  public  CountDownLatch getLatch() {
+  public final CountDownLatch getLatch() {
     return latch;
   }
 
   /**
    * @return the maxLength
    */
-  public  int getMaxLength() {
+  public final int getMaxLength() {
     return maxLength;
   }
 
   /**
    * @return the minLength
    */
-  public  int getMinLength() {
+  public final int getMinLength() {
     return minLength;
   }
 
   /**
    * @return the patternItr
    */
-  public Iterator<String> getPatternItr() {
+  public final Iterator<String> getPatternItr() {
     return patternItr;
   }
 
   /**
    * @return the writer
    */
-  public  CSVWriter getWriter() {
+  public final CSVWriter getWriter() {
     return writer;
   }
 
   /**
    * @return the extendedMode
    */
-  public  boolean isExtendedMode() {
+  public final boolean isExtendedMode() {
     return extendedMode;
   }
 
   /**
    * @return the searchReverse
    */
-  public  boolean isSearchReverse() {
+  public final boolean isSearchReverse() {
     return searchReverse;
   }
 
   /**
    * @param patternItr the patternItr to set
    */
-  public  void setPatternItr(Iterator<String> patternItr) {
+  public final void setPatternItr(Iterator<String> patternItr) {
     this.patternItr = patternItr;
   }
 
@@ -418,42 +418,42 @@ public class LoopMatcherThread implements Runnable {
    *
    * @return the MUTEX
    */
-  public static Semaphore getMUTEX() {
+  public final static Semaphore getMUTEX() {
     return MUTEX;
   }
 
   /**
    * @return the SEM
    */
-  public static Semaphore getSEM() {
+  public final static Semaphore getSEM() {
     return SEM;
   }
 
   /**
    * @return the started
    */
-  public static boolean isStarted() {
+  public final static boolean isStarted() {
     return started;
   }
 
   /**
    * @param aMUTEX the MUTEX to set
    */
-  public static void setMUTEX( Semaphore aMUTEX) {
+  public final static void setMUTEX( Semaphore aMUTEX) {
     MUTEX = aMUTEX;
   }
 
   /**
    * @param aSEM the SEM to set
    */
-  public static void setSEM( Semaphore aSEM) {
+  public final static void setSEM( Semaphore aSEM) {
     SEM = aSEM;
   }
 
   /**
    * @param aStarted the started to set
    */
-  public static void setStarted( boolean aStarted) {
+  public final static void setStarted( boolean aStarted) {
     started = aStarted;
   }
 
@@ -461,7 +461,7 @@ public class LoopMatcherThread implements Runnable {
    *
    * @param latch
    */
-  public  void setLatch( CountDownLatch latch) {
+  public final void setLatch( CountDownLatch latch) {
     this.latch = latch;
   }
 }
