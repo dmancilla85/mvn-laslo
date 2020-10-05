@@ -173,7 +173,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jMIAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("LASLO");
+        setTitle("Lazlo (LoopMatcher)");
         setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
         setIconImage(new ImageIcon(getClass().getResource("/noun_DNA_1088243.png")).getImage());
         setLocationByPlatform(true);
@@ -188,6 +188,7 @@ public class GUIFrame extends javax.swing.JFrame {
         jPanOutput.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jcbMakeRandoms.setFont(new java.awt.Font("Calibri", 0, 12)); // NOI18N
+        //java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("Bundle"); // NOI18N
         jcbMakeRandoms.setText(bundle.getString("RANDOMIZE_CHECK")); // NOI18N
         jcbMakeRandoms.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -792,16 +793,15 @@ public class GUIFrame extends javax.swing.JFrame {
 
     private void jSpinMinLengthStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinMinLengthStateChanged
         // TODO add your handling code here:
-        if (new Integer(this.jSpinMinLength.getValue().toString()) < 3) {
+        if (Integer.parseInt(this.jSpinMinLength.getValue().toString()) < 3) {
             this.jSpinMinLength.setValue(3);
         }
     }//GEN-LAST:event_jSpinMinLengthStateChanged
 
     private void jSpinWoobleStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinWoobleStateChanged
-        // TODO add your handling code here:
-        // TODO add your handling code here:
-        int aux = new Integer(this.jSpinWooble.getValue().toString());
-        int max = new Integer(this.jSpinMaxLength.getValue().toString());
+
+        int max = Integer.parseInt(this.jSpinMaxLength.getValue().toString());
+        int aux = Integer.parseInt(this.jSpinWooble.getValue().toString());
 
         if (aux < 0) {
             this.jSpinWooble.setValue(0);
@@ -811,9 +811,9 @@ public class GUIFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jSpinWoobleStateChanged
 
     private void jSpinMismatchStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinMismatchStateChanged
-        // TODO add your handling code here:
-        int aux = new Integer(this.jSpinMismatch.getValue().toString());
-        int max = new Integer(this.jSpinMaxLength.getValue().toString());
+
+        int aux = Integer.parseInt(this.jSpinMismatch.getValue().toString());
+        int max = Integer.parseInt(this.jSpinMaxLength.getValue().toString());
 
         if (aux < 0) {
             this.jSpinMismatch.setValue(0);
@@ -823,9 +823,9 @@ public class GUIFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jSpinMismatchStateChanged
 
     private void jSpinMaxLengthStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinMaxLengthStateChanged
-        // TODO add your handling code here:
-        int aux = new Integer(this.jSpinMaxLength.getValue().toString());
-        int min = new Integer(this.jSpinMinLength.getValue().toString());
+        
+        int aux = Integer.parseInt(this.jSpinMaxLength.getValue().toString());
+        int min = Integer.parseInt(this.jSpinMinLength.getValue().toString());
 
         if (aux < min) {
             this.jSpinMaxLength.setValue(min);
@@ -833,7 +833,7 @@ public class GUIFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jSpinMaxLengthStateChanged
 
     private void jButtonInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInActionPerformed
-        // TODO add your handling code here:
+
         final JFileChooser fc = new JFileChooser();
         JFrame myFrame = new JFrame();
         File file;
@@ -865,14 +865,8 @@ public class GUIFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonInActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        // TODO add your handling code here:
-        /*if (this.isRunning) {
-            MessageBox.show(bundle.getString("CANT_EXIT_WHILE_RUNNING")
-                    + bundle.getString("PROCESS_IS_RUNNING"), bundle.getString("PROCESS_RUNNING_MSG_TITLE"));
 
-        } else { */
         exit(0);
-        //}
     }//GEN-LAST:event_formWindowClosing
 
     private void jcbExtendedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbExtendedActionPerformed
@@ -880,7 +874,7 @@ public class GUIFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jcbExtendedActionPerformed
 
     private void jcbMakeRandomsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcbMakeRandomsActionPerformed
-        // TODO add your handling code here:
+
         boolean val = jcbMakeRandoms.isSelected();
         this.jLblNRand.setEnabled(val);
         this.jftNumberOfRandoms.setEnabled(val);
@@ -889,8 +883,7 @@ public class GUIFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jcbMakeRandomsActionPerformed
 
     private void jRBen_ENActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRBen_USActionPerformed
-        // TODO add your handling code here:
-        //jRBes_AR.setSelected(false);
+
         this.locale = new Locale("en", "US");
     }//GEN-LAST:event_jRBen_USActionPerformed
 
@@ -1355,12 +1348,12 @@ public class GUIFrame extends javax.swing.JFrame {
         }
 
         // Values
-        min = new Integer(this.jSpinMinLength.getValue().toString());
-        max = new Integer(this.jSpinMaxLength.getValue().toString());
-        wooble = new Integer(this.jSpinWooble.getValue().toString());
-        mismatch = new Integer(this.jSpinMismatch.getValue().toString());
-        randoms = new Integer(this.jftNumberOfRandoms.getValue().toString());
-        klet = new Integer(this.jftkLet.getValue().toString());
+        min = Integer.parseInt(this.jSpinMinLength.getValue().toString());
+        max = Integer.parseInt(this.jSpinMaxLength.getValue().toString());
+        wooble = Integer.parseInt(this.jSpinWooble.getValue().toString());
+        mismatch = Integer.parseInt(this.jSpinMismatch.getValue().toString());
+        randoms = Integer.parseInt(this.jftNumberOfRandoms.getValue().toString());
+        klet = Integer.parseInt(this.jftkLet.getValue().toString());
 
         // Loops
         loopList.addAll(asList(loops));

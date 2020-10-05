@@ -1,4 +1,4 @@
-# LoopMatcher (aka LASLO) v1.2.2 - README
+# LoopMatcher (aka LASLO) v1.3.3 - README
 
 ## Introduction
 
@@ -9,18 +9,25 @@ Multi-threaded application that searches for hairpin structures in cDNA / mRNA s
 JAVA Runtime 8 - Latest update. https://www.java.com/en/download/ It's highly recommended to have a multicore processor to process large sequences. This version only runs in a Windows x64 SO, because of the external executables.
 
 ## Latest releases
-- 1.22 29/11/19 :
+- 1.3.3 04/10/2020 :
+	- Fixed bug with BioJava when downloading some GenBank files. Code and dependencies updated.
+- 1.3.2 20/08/2020 :
+	- Fixed some minor bugs
+- 1.3.1 12/06/2020 :
+	- Fixed some minor bugs
+- 1.3.0 31/03/2020 :
+	- Added suport to analyze Vienna format files (sequence + brackets)
+- 1.2.2 29/11/2019 :
 	- Fixed some issues with NCBI downloads.
-- 1.20 17/10/19 : 
+- 1.2.0 17/10/2019 : 
 	- Added proxy configuration feature.
-
-- 1.10 17/9/19 : 
+- 1.1.0 17/9/2019 : 
 	- Added FORNA structure visualization (link to webpage)
 	- Added Language menu options - (English and spanish)
 	- Added "Avoid lonely pairs option"
 	- Fixed problems with large FASTA files ( > 50MB )
 
-- 1.01 25/8/19 : 
+- 1.0.1 25/8/2019 : 
 	- Fixed problem with generation of multiple shuffled sequences.
 
 ## Instructions

@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import static java.lang.System.out;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,8 @@ public class UShuffle {
         String fileName = "fruitfly_chen";
 
         out.println("Iniciando...");
-        // Generation of the iterator of {id,sequence}
+
+        // Generation of the iterator of id,sequence
         LinkedHashMap<String, DNASequence> fasta = null;
         try {
             fasta = readFastaDNASequence(new File("./ext/" + fileName + ext), false);
@@ -74,6 +76,18 @@ public class UShuffle {
         return RANDOM_PATH;
     }
 
+    private static String getQualifier(String name, Map qualifier) {
+        String value;
+
+        if (qualifier.get(name) != null) {
+            value = ((Qualifier) ((List) (qualifier.get(name))).get(0)).getValue();
+        } else {
+            value = "N/A";
+        }
+
+        return value;
+    }
+
     /**
      * Generate shuffled sequences with the k-let value indicated.
      *
@@ -87,24 +101,28 @@ public class UShuffle {
      */
     @SuppressWarnings("NestedAssignment")
     public static int makeShuffleSequences(String path, String filename,
-            LinkedHashMap<String, DNASequence> fasta, int nRandoms, int k,
+            Map<String, DNASequence> fasta, int nRandoms, int k,
             boolean isGenBank) {
 
         char sep = '@';
         int exitVal = 0;
-        String aux = "", gene, synonym, note;
+        String aux = "";
+        String gene = "";
+        String synonym = "";
+        String note = "";
         String fileNameWithOutExt;
         fileNameWithOutExt = filename.replaceFirst("[.][^.]+$", "");
         String destiny;
         String sequence;
-        String header = "", id, cds;
-        boolean mkdirs, delete;
+        String header = "";
+        String id = "";
+        String cds;
+        boolean mkdirs;
+
         mkdirs = new File(path + RANDOM_PATH).mkdirs();
 
-        if (!mkdirs) {
-            if (!new File(path + RANDOM_PATH).exists()) {
-                out.println("<Error: Failed to create new 'shuffled' path.>");
-            }
+        if (!mkdirs && !new File(path + RANDOM_PATH).exists()) {
+            out.println("<Error: Failed to create new 'shuffled' path.>");
         }
 
         for (int i = 1; i <= nRandoms; i++) {
@@ -115,11 +133,7 @@ public class UShuffle {
                 File file = new File(destiny);
 
                 if (file.exists()) {
-                    delete = (new File(destiny)).delete();
-
-                    if (!delete) {
-                        out.println("<Error: Failed to delete old shuffled file.>");
-                    }
+                    Files.delete(file.toPath());
                 }
 
                 file.createNewFile();
@@ -133,42 +147,36 @@ public class UShuffle {
                         if (!isGenBank) {
                             header = element.getOriginalHeader();
                         } else {
-                            Map qual = ((FeatureInterface) 
-                                    element.getFeaturesByType("gene")
+                            Map qualGene = ((FeatureInterface) element.getFeaturesByType("gene")
                                     .toArray()[0]).getQualifiers();
+                            FeatureInterface featCds = ((FeatureInterface) element.getFeaturesByType("CDS").toArray()[0]);
 
-                            if (!qual.isEmpty()) {
-                                gene = ((Qualifier) ((List) 
-                                        (qual.get("gene"))).get(0)).getValue();
-                                synonym = ((Qualifier) ((List) 
-                                        (qual.get("gene_synonym"))).get(0)).getValue();
+                            if (!qualGene.isEmpty()) {
 
-                                try {
-                                    note = ((Qualifier) ((List) 
-                                            (qual.get("note"))).get(0)).getValue();
-                                } catch (Exception e) {
-                                    note = "null";
-                                }
-
-                                id = element.getAccession().getID();
-                                cds = ((FeatureInterface) element.getFeaturesByType("CDS")
-                                        .toArray()[0]).getSource();
-
-                                header = gene + sep + synonym + sep
-                                        + note + sep + id + sep + cds;
+                                gene = getQualifier("gene", qualGene);
+                                synonym = getQualifier("gene_synonym", qualGene);
+                                note = getQualifier("note", qualGene);
                             }
+
+                            if (featCds != null) {
+                                cds = featCds.getSource();
+                            } else {
+                                cds = "";
+                            }
+
+                            id = element.getAccession().getID();
+                            header = gene + sep + synonym + sep
+                                    + note + sep + id + sep + cds;
                         }
 
                         sequence = element.getSequenceAsString();
-                        //String cmd = COMMAND_SHUFFLE + sequence
-                        //        + " -n 1 -k " + k;
 
                         if (sequence.length() > 30000) {
                             sequence = sequence.substring(0, 30000);
                         }
-                        
-                        Random gen = new Random( java.lang.System.currentTimeMillis() );
-                        
+
+                        Random gen = new Random(java.lang.System.currentTimeMillis());
+
                         Process pr
                                 = new ProcessBuilder(COMMAND_SHUFFLE, "-s", sequence,
                                         "-k", Integer.toString(k),
@@ -194,9 +202,12 @@ public class UShuffle {
                         }
 
                         exitVal = pr.waitFor();
-
+                        element = null;
                     }
+
                 }
+                fw = null;
+                file = null;
 
             } catch (IOException | InterruptedException ex) {
                 out.println("Error: " + ex.getMessage());

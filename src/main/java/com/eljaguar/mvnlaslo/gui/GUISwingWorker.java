@@ -21,7 +21,9 @@ import com.eljaguar.mvnlaslo.core.LoopMatcher;
 import com.eljaguar.mvnlaslo.io.GenBank;
 import java.io.File;
 import static java.lang.System.out;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
@@ -61,12 +63,33 @@ class GUISwingWorker extends
         File[] listOfFiles;
 
         LoopMatcher lm = this.getLoop();
-        
+
         if (frame.getTab1().getSelectedIndex() == 1) {
 
             try {
-                out.print(frame.getCurrentBundle().getString("DOWNLOAD_NCBI"));
-                dnaFile = GenBank.downLoadSequenceForId(frame.getGeneList());
+                out.println(frame.getCurrentBundle().getString("DOWNLOAD_NCBI"));
+
+                listOfFiles = new File[frame.getGeneList().size()];
+                int i = 0;
+
+                for (String e : frame.getGeneList()) {
+                    List<String> lista = new ArrayList<>();
+                    lista.add(e);
+                    dnaFile = (LinkedHashMap<String, DNASequence>) GenBank.downLoadSequenceForId(lista);
+
+                    if (dnaFile != null) {
+                        // call the file as the first ncbi id
+                        pathIn = GenBank.makeFile(frame.getPathOut(), dnaFile,
+                                lista.get(0).trim());
+                        
+                        if (pathIn == null) {
+                            out.println("Skipping this file...");
+                        } else {
+                            out.print(frame.getCurrentBundle().getString("NCBI_DONE"));
+                            listOfFiles[i++] = new File(pathIn);
+                        }
+                    }
+                }
 
             } catch (Exception ex) {
                 out.printf(frame.getCurrentBundle().getString("ERROR"),
@@ -76,31 +99,11 @@ class GUISwingWorker extends
                 this.cancel(true);
                 return 0;
             }
-            
-            if(dnaFile == null){
-                frame.setIsRunning(false);
-                this.cancel(true);
-                return 0;
-            }
 
-            // call the file as the first ncbi id
-            pathIn = GenBank.makeFile(frame.getPathOut(), dnaFile,
-                    frame.getGeneList().get(0).trim());
-            out.print(frame.getCurrentBundle().getString("NCBI_DONE"));
-
-            if (pathIn == null) {
-                out.println(frame.getCurrentBundle().getString("NCBI_FATAL"));
-                frame.setIsRunning(false);
-                this.cancel(true);
-                return 0;
-            }
-
-            listOfFiles = new File[1];
-            listOfFiles[0] = new File(pathIn);
             lm.setFileList(listOfFiles);
 
         }
-        
+
         this.setOk(lm.startReadingFiles());
         return 1;
     }
@@ -115,7 +118,6 @@ class GUISwingWorker extends
                 frame.getCurrentBundle().getString("END_TITLE"));
         frame.getProgressBar().setValue(100);
         frame.setIsRunning(false);
-        System.gc();
     }
 
     /**

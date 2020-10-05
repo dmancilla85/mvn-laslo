@@ -25,6 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
 import org.biojava.nbio.core.sequence.DNASequence;
 import org.biojava.nbio.core.sequence.io.GenbankReaderHelper;
 import org.biojava.nbio.core.sequence.io.GenbankWriterHelper;
@@ -41,8 +43,8 @@ public class GenBank extends SourceFile {
     private String location;
     private String synonym;
     private String proxyConf;
-    private static String PROXY_FILE = "proxy";
-    private final static String E_FETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?";
+    private static String proxyFileName = "proxy";
+    private static final String E_FETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?";
 
     private static String HEADER
             = "Gen" + ROW_DELIMITER
@@ -88,7 +90,7 @@ public class GenBank extends SourceFile {
      * @return Path of the new file
      */
     public static String makeFile(String path,
-            LinkedHashMap<String, DNASequence> dnaFile, String name) {
+            Map<String, DNASequence> dnaFile, String name) {
         String absolutePath = path + "\\" + name + ".gb";
         File file = new File(absolutePath);
 
@@ -101,7 +103,7 @@ public class GenBank extends SourceFile {
                     dnaFile.values());
         } catch (Exception ex) {
             out.println("DNAFile size: " + dnaFile.size());
-            out.println("ERROR: " + ex.getMessage() + ". "
+            out.println("ERROR in MakeFile: " + ex.getMessage() + ". "
                     + ex.getLocalizedMessage());
             out.println("*Method: GenBank-makeFile*");
             return null;
@@ -122,7 +124,7 @@ public class GenBank extends SourceFile {
 
         String proxy = "";
 
-        if (!(new File(PROXY_FILE).exists())) {
+        if (!(new File(proxyFileName).exists())) {
             return "";
         }
 
@@ -136,7 +138,7 @@ public class GenBank extends SourceFile {
             }
 
         } catch (IOException e) {
-            out.println("ERROR: " + e.getLocalizedMessage());
+            out.println("ERROR in GetProxyConf: " + e.getLocalizedMessage());
             out.println("*Method: GenBank-getProxyConfiguration*");
         }
 
@@ -205,7 +207,7 @@ public class GenBank extends SourceFile {
      * @throws Exception
      */
     @SuppressWarnings("SleepWhileInLoop")
-    public static LinkedHashMap<String, DNASequence>
+    public static Map<String, DNASequence>
             downLoadSequenceForId(List<String> genBankId) throws Exception {
 
         LinkedHashMap<String, DNASequence> dnaFile;
@@ -215,7 +217,6 @@ public class GenBank extends SourceFile {
 
         dnaFile = new LinkedHashMap<>();
 
-        //connectToProxy();
         for (String transcriptoId : genBankId) {
             try {
                 request = String.format("db=nuccore&id=%s&rettype=gb&retmode=text",
@@ -225,13 +226,26 @@ public class GenBank extends SourceFile {
                 ncbiGenbank = new URL(E_FETCH + request);
                 tmp = GenbankReaderHelper.readGenbankDNASequence(
                         ncbiGenbank.openStream());
-                out.println(transcriptoId.trim() + "...");
+                out.print(transcriptoId.trim() + "... ");
+            } catch (CompoundNotFoundException ex) {
+                out.println("ERROR: Compound Not Found Exception. Cause: "
+                        + (ex.getCause()!=null?ex.getCause().getMessage():ex.getLocalizedMessage()));
+                //return null;
 
             } catch (MalformedURLException ex) {
                 out.println("ERROR: Malformed URL Exception. Cause: "
                         + ex.getCause().getMessage());
                 //return null;
             } catch (IOException ex) {
+
+                if (ex.getLocalizedMessage().contains("400")) {
+                    out.println("ERROR: " + transcriptoId + " code not found.");
+                } else {
+                    out.println("ERROR: IO Exception (" + transcriptoId
+                            + "). " + ex.getMessage());
+                }
+                //return null;
+            } catch (Exception ex) {
 
                 if (ex.getLocalizedMessage().contains("400")) {
                     out.println("ERROR: " + transcriptoId + " code not found.");
@@ -350,8 +364,8 @@ public class GenBank extends SourceFile {
         String[] parts = cds.split("\\.\\.");
 
         if (parts.length > 0) {
-            this.setCdsStart(new Integer(parts[0]));
-            this.setCdsEnd(new Integer(parts[1]));
+            this.setCdsStart(Integer.parseInt(parts[0]));
+            this.setCdsEnd(Integer.parseInt(parts[1]));
         }
     }
 
@@ -421,10 +435,10 @@ public class GenBank extends SourceFile {
     }
 
     /**
-     * @return the PROXY_FILE
+     * @return the proxyFileName
      */
     public static String getPROXY_FILE() {
-        return PROXY_FILE;
+        return proxyFileName;
     }
 
     /**
@@ -435,9 +449,9 @@ public class GenBank extends SourceFile {
     }
 
     /**
-     * @param aPROXY_FILE the PROXY_FILE to set
+     * @param aPROXY_FILE the proxyFileName to set
      */
     public static void setPROXY_FILE(String aPROXY_FILE) {
-        PROXY_FILE = aPROXY_FILE;
+        proxyFileName = aPROXY_FILE;
     }
 }

@@ -104,9 +104,7 @@ public class RNAFoldInterface {
       outstr.write('@');
       outstr.write(13);
       outstr.close();
-
-      /*try (*/
-      InputStream in = child.getInputStream()/*) {*/;
+      InputStream in = child.getInputStream();
 
       isr = new InputStreamReader(in);
       br = new BufferedReader(isr);
@@ -119,7 +117,7 @@ public class RNAFoldInterface {
       Pattern regex = Pattern.compile("(\\d+(?:\\.\\d+)?)");
       Matcher matcher = regex.matcher(line);
       if (matcher.find()) {
-        this.mfe = new Double(matcher.group(1));
+        this.mfe = Double.parseDouble(matcher.group(1));
         this.mfe *= (-1);
       }
 
@@ -129,7 +127,6 @@ public class RNAFoldInterface {
 
     } catch (IOException ex) {
       out.println("--Error executing RNAFold--");
-      //Logger.getLogger(RNAFoldInterface.class.getName()).log(Level.SEVERE, null, ex);
       out.println("SeqLength: " + sequence.length());
     }
   }
