@@ -50,7 +50,7 @@ public class OSValidator {
             out.println("Your OS is not support!!");
         }
 
-        //out.println("Number of cores: " + getNumberOfCPUCores());
+        out.println("Number of cores: " + getNumberOfCPUCores());
     }
 
     /**
@@ -109,10 +109,10 @@ public class OSValidator {
      */
     @SuppressWarnings({"null", "NestedAssignment"})
     public static int getNumberOfCPUCores() {
-        //OSValidator osValidator; 
-        //osValidator = new OSValidator();
+
         String command = "";
         if (OSValidator.isMac()) {
+            command = "sysctl -a | grep machdep.cpu";
         } else if (OSValidator.isUnix()) {
             command = "lscpu";
         } else if (OSValidator.isWindows()) {
@@ -131,6 +131,7 @@ public class OSValidator {
                 process = Runtime.getRuntime().exec(command);
             }
         } catch (IOException e) {
+            out.println("Error: " + e.getMessage());
         }
 
         BufferedReader reader;
@@ -157,6 +158,7 @@ public class OSValidator {
                 }
             }
         } catch (IOException e) {
+            out.println("Error: " + e.getMessage());
         }
         if (OSValidator.isUnix()) {
             return numberOfCores * sockets;

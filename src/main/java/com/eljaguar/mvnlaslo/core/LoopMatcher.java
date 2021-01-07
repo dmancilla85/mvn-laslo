@@ -99,12 +99,13 @@ public class LoopMatcher {
      * @param searchReverse
      */
     public LoopMatcher(String pathOut, String pathIn,
-            ArrayList<String> loopPatterns, String additionalSequence,
+            List<String> loopPatterns, String additionalSequence,
             InputSequence inputType, int minLength, int maxLength,
             int maxWooble, int maxMismatch, Locale locale,
             int kLetRandoms, boolean searchReverse) {
         this.pathOut = pathOut;
-        this.loopPatterns = loopPatterns;
+        this.pathIn = pathIn;
+        this.loopPatterns = (ArrayList<String>) loopPatterns;
         this.inputType = inputType;
         this.minLength = minLength;
         this.maxLength = maxLength;
@@ -303,7 +304,7 @@ public class LoopMatcher {
      * @return
      */
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public ArrayList<String> getLoopPatterns() {
+    public List<String> getLoopPatterns() {
         return loopPatterns;
     }
 
@@ -312,10 +313,10 @@ public class LoopMatcher {
      * @param loopPatterns
      */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
-    public void setLoopPatterns(ArrayList<String> loopPatterns) {
+    public void setLoopPatterns(List<String> loopPatterns) {
         int maxWord = 0;
 
-        this.loopPatterns = loopPatterns;
+        this.loopPatterns = (ArrayList<String>) loopPatterns;
 
         for (int i = 0; i < loopPatterns.size(); i++) {
             if (loopPatterns.get(i).trim().length() > maxWord) {
@@ -452,7 +453,6 @@ public class LoopMatcher {
             writer.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             out.println(java.text.MessageFormat.format(
                     getBundle()
                             .getString("ERROR_EX"), new Object[]{e.getMessage()}));
@@ -585,7 +585,8 @@ public class LoopMatcher {
         boolean isVienna;
         boolean isFasta;
         boolean formatFile;
-        String fileName, fileOut;
+        String fileName;
+        String fileOut;
         final int MAX_HILOS = 15;
         int totalSecuencias;
         int nHilos = MAX_HILOS;
@@ -621,7 +622,7 @@ public class LoopMatcher {
                 }
             }
 
-            // Generation of the iterator of {id,sequence}
+            // Generation of the iterator of id,sequence
             LinkedHashMap<String, DNASequence> fasta;
             fasta = new LinkedHashMap<>();
 

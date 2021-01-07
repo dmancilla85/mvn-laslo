@@ -23,14 +23,14 @@ package com.eljaguar.mvnlaslo.io;
  */
 public class SourceFile {
 
-    public final static String FIELD_DELIMITER = "|"; //$NON-NLS-1$
-    public final static String ROW_DELIMITER = ";"; //$NON-NLS-1$
-    public final static String LOG_EXT = ".log";
-    public final static String CSV_EXT = ".csv";
-    public final static String FASTA_EXT = ".fasta";
-    public final static String FASTA_EXT_2 = ".fa";
-    public final static String GENBANK_EXT = ".gb";
-    public final static String VIENNA_EXT = ".b";
+    public static final String FIELD_DELIMITER = "|"; //$NON-NLS-1$
+    public static final String ROW_DELIMITER = ";"; //$NON-NLS-1$
+    public static final String LOG_EXT = ".log";
+    public static final String CSV_EXT = ".csv";
+    public static final String FASTA_EXT = ".fasta";
+    public static final String FASTA_EXT_2 = ".fa";
+    public static final String GENBANK_EXT = ".gb";
+    public static final String VIENNA_EXT = ".b";
     protected String transcriptID;
     protected String geneID;
     protected String geneSymbol;
@@ -45,9 +45,9 @@ public class SourceFile {
         this.rowDelimiter = ROW_DELIMITER;
         this.transcriptID = null;
         this.geneID = null;
-        this.geneSymbol = null;        
+        this.geneSymbol = null;
     }
-    
+
     /**
      *
      * @param header
@@ -57,14 +57,14 @@ public class SourceFile {
 
         InputSequence out = InputSequence.GENERIC;
 
-        if(header.contains("genbank")){
+        if (header.contains("genbank")) {
             return InputSequence.GENBANK;
         }
-        
-        if(header.contains("@")){
+
+        if (header.contains("@")) {
             return InputSequence.GENBANK;
         }
-        
+
         if (header.contains("gene:")
                 && header.contains("gene_biotype:")
                 && header.contains("transcript_biotype:")

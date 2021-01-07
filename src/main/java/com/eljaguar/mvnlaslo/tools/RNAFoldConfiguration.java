@@ -20,9 +20,31 @@ package com.eljaguar.mvnlaslo.tools;
  * 
  * @author dmancilla
  */
-public class RNAFoldConfiguration {
+public final class RNAFoldConfiguration {
     private static boolean avoidLonelyPairs;
     private static boolean avoidGUPairs;
-    public final static int DEFAULT_TEMP = 37; 
-    public final static int SEQUENCE_MAX_SIZE = 20000;
+    public static final  int DEFAULT_TEMP = 37; 
+    public static final  int SEQUENCE_MAX_SIZE = 20000;
+
+    private RNAFoldConfiguration(){
+        // not called
+    }
+    
+    public static boolean isAvoidLonelyPairs() {
+        return avoidLonelyPairs;
+    }
+
+    public static void setAvoidLonelyPairs(boolean avoidLonelyPairs) {
+        RNAFoldConfiguration.avoidLonelyPairs = avoidLonelyPairs;
+    }
+
+    public static boolean isAvoidGUPairs() {
+        return avoidGUPairs;
+    }
+
+    public static void setAvoidGUPairs(boolean avoidGUPairs) {
+        RNAFoldConfiguration.avoidGUPairs = avoidGUPairs;
+    }
+    
+    
 }

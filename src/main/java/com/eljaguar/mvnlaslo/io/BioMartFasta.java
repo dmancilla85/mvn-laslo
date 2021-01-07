@@ -25,7 +25,7 @@ public class BioMartFasta extends SourceFile {
 
     private static int nCols = 6;
     private static char fs = '|';
-    private String columns[];
+    private String[] columns;
 
     /**
      * 
